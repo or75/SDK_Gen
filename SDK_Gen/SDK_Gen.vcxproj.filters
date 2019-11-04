@@ -4,15 +4,51 @@
     <Filter Include="SDK_Gen">
       <UniqueIdentifier>{4f981302-f26a-4d80-aa54-d859b3e61b6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SDK_Gen\Dota">
+      <UniqueIdentifier>{d1a9837b-b797-4f5e-9be7-672ae184a2bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK_Gen\Components">
+      <UniqueIdentifier>{a96317f6-a274-440e-acb7-8e2de176e585}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
       <Filter>SDK_Gen</Filter>
     </ClCompile>
+    <ClCompile Include="Dota\Factory.cpp">
+      <Filter>SDK_Gen\Dota</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\DebugLog.cpp">
+      <Filter>SDK_Gen\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Generator.cpp">
+      <Filter>SDK_Gen</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Memory.cpp">
+      <Filter>SDK_Gen\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DllMain.hpp">
       <Filter>SDK_Gen</Filter>
+    </ClInclude>
+    <ClInclude Include="Dota\Factory.hpp">
+      <Filter>SDK_Gen\Dota</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\DebugLog.hpp">
+      <Filter>SDK_Gen\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Generator.hpp">
+      <Filter>SDK_Gen</Filter>
+    </ClInclude>
+    <ClInclude Include="Dota\SDK.hpp">
+      <Filter>SDK_Gen\Dota</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\Memory.hpp">
+      <Filter>SDK_Gen\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Dota\DataBase.hpp">
+      <Filter>SDK_Gen\Dota</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
