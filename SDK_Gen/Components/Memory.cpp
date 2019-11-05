@@ -58,3 +58,11 @@ auto FindPattern( const char* module_name , const char* pattern , uint32_t offse
 
 	return FindPattern( pattern , Start , Start + Size , offset , read );
 }
+
+auto GetCallFunction( uint64_t address , uint32_t offset , uint32_t size ) -> uint64_t
+{
+	auto Offset = int32_t( *(uint32_t*)( address + offset ) );
+	auto Address = address + size;
+
+	return Address + Offset;
+}

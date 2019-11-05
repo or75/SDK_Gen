@@ -6,24 +6,122 @@
 
 namespace index
 {
-	namespace CSchemaType
-	{
-		constexpr auto GetAtomicCategory = 6;
-	}
 	namespace CSchemaSystemTypeScope
 	{
 		constexpr auto FindDeclaredClass = 2;
 		constexpr auto FindDeclaredEnum = FindDeclaredClass + 1;
 		constexpr auto FindSchemaTypeByName = FindDeclaredEnum + 1;
-		constexpr auto FindType_DeclaredClass = 21;
-		constexpr auto FindType_DeclaredEnum = FindType_DeclaredClass + 1;
-		constexpr auto GetScopeName = 31;
-		constexpr auto IsGlobalScope = GetScopeName + 1;
 	}
 	namespace CSchemaSystem
 	{
 		constexpr auto GlobalTypeScope = 11;
 		constexpr auto FindTypeScopeForModule = 13;
+	}
+	namespace C_DOTAPlayer
+	{
+		constexpr auto PATTERN_PrepareUnitOrders = "FF 90 ? ? ? ? 45 33 C0 33 D2 48 8B CF E8 ? ? ? ? E9 ? ? ? ? CC";
+		constexpr auto PATTERN_CreateMove = "FF 90 ? ? ? ? 48 8B 5C 24 38 48 8B 74 24 40 48 83 C4 20 5F C3 48 89 5C 24 10";
+
+		/*
+		// PrepareUnitOrders
+		// FF 90 ? ? ? ? 45 33 C0 33 D2 48 8B CF E8 ? ? ? ? E9 ? ? ? ? CC
+		00007FFAF905AEC3 | FF90 580D0000              | call qword ptr ds:[rax+0xD58]                         |
+		00007FFAF905AEC9 | 45:33C0                    | xor r8d,r8d                                           |
+		00007FFAF905AECC | 33D2                       | xor edx,edx                                           |
+		00007FFAF905AECE | 48:8BCF                    | mov rcx,rdi                                           |
+		00007FFAF905AED1 | E8 FA73FFFF                | call <client.sub_7FFAF90522D0>                        |
+		00007FFAF905AED6 | E9 25FCFFFF                | jmp client.7FFAF905AB00                               |
+		00007FFAF905AEDB | CC                         | int3                                                  |
+		*/
+		constexpr auto PrepareUnitOrders = 427;
+
+		// FF 90 ? ? ? ? 48 8B 5C 24 38 48 8B 74 24 40 48 83 C4 20 5F C3 48 89 5C 24 10
+		/*
+		00007FFAF8F6826A | FF90 200A0000              | call qword ptr ds:[rax+0xA20]                         |
+		00007FFAF8F68270 | 48:8B5C24 38               | mov rbx,qword ptr ss:[rsp+0x38]                       |
+		00007FFAF8F68275 | 48:8B7424 40               | mov rsi,qword ptr ss:[rsp+0x40]                       |
+		00007FFAF8F6827A | 48:83C4 20                 | add rsp,0x20                                          |
+		00007FFAF8F6827E | 5F                         | pop rdi                                               |
+		00007FFAF8F6827F | C3                         | ret                                                   |
+		00007FFAF8F68280 | 48:895C24 10               | mov qword ptr ss:[rsp+0x10],rbx                       |
+		*/
+		constexpr auto CreateMove = 324;
+	}
+	namespace IEngineClient
+	{
+		constexpr auto PATTERN_GetMaxClients = "FF 92 ? ? ? ? 83 F8 01 7E 11";
+		constexpr auto PATTERN_IsInGame = "FF 90 ? ? ? ? 3A ? ? ? ? ? 74 1F 48 8B 4E 08";
+		constexpr auto PATTERN_Con_NPrintf = "FF 90 ? ? ? ? 44 ? ? ? ? ? ? ? ? 44 ? ? ? ? ? ? ? ? F3 44 0F 11 54 33 30";
+		constexpr auto PATTERN_GetNetChannelInfo = "FF 90 ? ? ? ? 48 8B D8 ? ? ? ? ? ? ? 48 85 C0";
+		constexpr auto PATTERN_ClientCmd_Unrestricted = "FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 8B 01 48 83 C4 28 48 ? ? ? ? ? ? CC CC CC 48 89 5C 24 08";
+
+		/*
+		00007FFB0AB47BA8:"unpause\n"
+		...
+		00007FFB0A79735B | FF92 C8000000              | call qword ptr ds:[rdx+0xC8]                          | [rdx+C8]:sub_7FFB0A73BF60 offset
+		00007FFB0A797361 | 83F8 01                    | cmp eax,0x1                                           |
+		00007FFB0A797364 | 7E 11                      | jle engine2.7FFB0A797377                              |
+		00007FFB0A797366 | 48:85DB                    | test rbx,rbx                                          |
+		00007FFB0A797369 | 74 47                      | je engine2.7FFB0A7973B2                               |
+		00007FFB0A79736B | 48:8BCB                    | mov rcx,rbx                                           |
+		*/
+		constexpr auto GetMaxClients = 25;
+		/*
+		00007FFAF9587EAF | FF90 D0000000              | call qword ptr ds:[rax+0xD0]                          | [rax+D0]:sub_7FFB0A73C020 offset
+		00007FFAF9587EB5 | 3A86 98010000              | cmp al,byte ptr ds:[rsi+0x198]                        |
+		00007FFAF9587EBB | 74 1F                      | je client.7FFAF9587EDC                                |
+		00007FFAF9587EBD | 48:8B4E 08                 | mov rcx,qword ptr ds:[rsi+0x8]                        |
+		00007FFAF9587EC1 | 48:8D15 50263801           | lea rdx,qword ptr ds:[0x7FFAFA90A518]                 | 00007FFAFA90A518:"IsInGame"
+		00007FFAF9587EC8 | 8886 98010000              | mov byte ptr ds:[rsi+0x198],al                        |
+		*/
+		constexpr auto IsInGame = 26;
+		/*
+		00007FFAF8F6545D | 4C:8D05 8CC61301           | lea r8,qword ptr ds:[0x7FFAFA0A1AF0]                  | 00007FFAFA0A1AF0:"Pitch: %6.1f   Yaw: %6.1f   Dist: %6.1f %16s"
+		00007FFAF8F65464 | F3:0F104C33 34             | movss xmm1,dword ptr ds:[rbx+rsi+0x34]                |
+		00007FFAF8F6546A | 48:8B0D CF3E1202           | mov rcx,qword ptr ds:[0x7FFAFB089340]                 |
+		00007FFAF8F65471 | 48:895424 30               | mov qword ptr ss:[rsp+0x30],rdx                       |
+		00007FFAF8F65476 | BA 08000000                | mov edx,0x8                                           |
+		00007FFAF8F6547B | 0F5AC0                     | cvtps2pd xmm0,xmm0                                    |
+		00007FFAF8F6547E | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+		00007FFAF8F65481 | 0F5ADB                     | cvtps2pd xmm3,xmm3                                    |
+		00007FFAF8F65484 | 0F5AC9                     | cvtps2pd xmm1,xmm1                                    |
+		00007FFAF8F65487 | F2:0F114424 28             | movsd qword ptr ss:[rsp+0x28],xmm0                    |
+		00007FFAF8F6548D | 6649:0F7ED9                | movq r9,xmm3                                          |
+		00007FFAF8F65492 | F2:0F114C24 20             | movsd qword ptr ss:[rsp+0x20],xmm1                    |
+		00007FFAF8F65498 | FF90 E0000000              | call qword ptr ds:[rax+0xE0]                          | // offset
+		*/
+		constexpr auto Con_NPrintf = 28;
+		/*
+		00007FFAF9F07DC0:"PanoramaUI"
+		00007FFAFA9838A8:"CDOTA_Hud_NetGraph::Update"
+		...
+		00007FFAF97AFCA8 | FF90 F0000000              | call qword ptr ds:[rax+0xF0]                          | // offset
+		00007FFAF97AFCAE | 48:8BD8                    | mov rbx,rax                                           |
+		00007FFAF97AFCB1 | 48:8B05 C0149401           | mov rax,qword ptr ds:[0x7FFAFB0F1178]                 |
+		00007FFAF97AFCB8 | 48:85C0                    | test rax,rax                                          |
+		*/
+		constexpr auto GetNetChannelInfo = 30;
+		/*
+		00007FFAF8FA2501 | 48:8D15 40D21001           | lea rdx,qword ptr ds:[0x7FFAFA0AF748]                 | 00007FFAFA0AF748:"host_timescale 0"
+		00007FFAF8FA2508 | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+		00007FFAF8FA250B | FF90 20010000              | call qword ptr ds:[rax+0x120]                         |
+		00007FFAF8FA2511 | 48:8B0D 286E0E02           | mov rcx,qword ptr ds:[0x7FFAFB089340]                 |
+		00007FFAF8FA2518 | 48:8D15 B1D11001           | lea rdx,qword ptr ds:[0x7FFAFA0AF6D0]                 | 00007FFAFA0AF6D0:"toggleconsole"
+		00007FFAF8FA251F | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+		00007FFAF8FA2522 | 48:83C4 28                 | add rsp,0x28                                          |
+		00007FFAF8FA2526 | 48:FFA0 20010000           | jmp qword ptr ds:[rax+0x120]                          | // offset
+		00007FFAF8FA252D | CC                         | int3                                                  |
+		00007FFAF8FA252E | CC                         | int3                                                  |
+		00007FFAF8FA252F | CC                         | int3                                                  |
+		00007FFAF8FA2530 | 48:895C24 08               | mov qword ptr ss:[rsp+0x8],rbx                        |
+		00007FFAF8FA2535 | 57                         | push rdi                                              |
+		00007FFAF8FA2536 | 48:83EC 20                 | sub rsp,0x20                                          |
+		00007FFAF8FA253A | 48:8D05 67F31001           | lea rax,qword ptr ds:[<&sub_7FFAF8FA2580>]            |
+		*/
+		constexpr auto ClientCmd_Unrestricted = 36; // FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 8B 01 48 83 C4 28 48 ? ? ? ? ? ? CC CC CC 48 89 5C 24 08
+		constexpr auto GetScreenSize = 46;
+		constexpr auto GetLevelName = 49;
+		constexpr auto GetLevelNameShort = 50;
 	}
 }
 
@@ -129,35 +227,6 @@ public:
 class CSchemaType
 {
 public:
-	enum ETypeCategory
-	{
-		Schema_Builtin = 0 ,
-		Schema_Ptr = 1 ,
-		Schema_Bitfield = 2 ,
-		Schema_FixedArray = 3 ,
-		Schema_Atomic = 4 ,
-		Schema_DeclaredClass = 5 ,
-		Schema_DeclaredEnum = 6 ,
-		Schema_None = 7
-	};
-
-	enum EAtomicCategory
-	{
-		Atomic_Basic = 0 ,
-		Atomic_T = 1 ,
-		Atomic_TT = 2 ,
-		Atomic_I = 3 ,
-		Atomic_None = 4
-	};
-
-	virtual ETypeCategory GetTypeCategory() = 0;
-
-	auto GetAtomicCategory() -> EAtomicCategory
-	{
-		VirtualFn( EAtomicCategory )( CSchemaType* );
-		return vget< Fn >( this , index::CSchemaType::GetAtomicCategory )( this );
-	}
-
 	char* szTypeName;
 };
 
@@ -205,40 +274,94 @@ public:
 class CSchemaSystemTypeScope
 {
 public:
+	// CFingerBone etc
+	/*
+	00007FFB3462E7E0 | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+	00007FFB3462E7E3 | 48:FFA0 C8000000           | jmp qword ptr ds:[rax+0xC8]                           |
+
+	00007FFB3462B5E0 | 40:53                      | push rbx                                              |
+	00007FFB3462B5E2 | 48:83EC 20                 | sub rsp,0x20                                          |
+	00007FFB3462B5E6 | 4C:8BCA                    | mov r9,rdx                                            |
+	00007FFB3462B5E9 | 48:8BD9                    | mov rbx,rcx                                           |
+	00007FFB3462B5EC | 48:85D2                    | test rdx,rdx                                          |
+	00007FFB3462B5EF | 74 3C                      | je schemasystem.7FFB3462B62D                          |
+	00007FFB3462B5F1 | 803A 00                    | cmp byte ptr ds:[rdx],0x0                             |
+	00007FFB3462B5F4 | 74 37                      | je schemasystem.7FFB3462B62D                          |
+	00007FFB3462B5F6 | 48:83C8 FF                 | or rax,0xFFFFFFFFFFFFFFFF                             |
+	00007FFB3462B5FA | 66:0F1F4400 00             | nop word ptr ds:[rax+rax],ax                          |
+	00007FFB3462B600 | 48:FFC0                    | inc rax                                               |
+	00007FFB3462B603 | 803C02 00                  | cmp byte ptr ds:[rdx+rax],0x0                         |
+	00007FFB3462B607 | 75 F7                      | jne schemasystem.7FFB3462B600                         |
+	00007FFB3462B609 | 41:B8 EDFEADBA             | mov r8d,0xBAADFEED                                    |
+	00007FFB3462B60F | 8BD0                       | mov edx,eax                                           |
+	00007FFB3462B611 | 49:8BC9                    | mov rcx,r9                                            |
+	00007FFB3462B614 | E8 37550200                | call <schemasystem.sub_7FFB34650B50>                  |
+	00007FFB3462B619 | 8BD0                       | mov edx,eax                                           |
+	00007FFB3462B61B | 48:8BCB                    | mov rcx,rbx                                           |
+	00007FFB3462B61E | 48:8B03                    | mov rax,qword ptr ds:[rbx]                            |
+	00007FFB3462B621 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462B625 | 5B                         | pop rbx                                               |
+	00007FFB3462B626 | 48:FFA0 C0000000           | jmp qword ptr ds:[rax+0xC0]                           |
+	00007FFB3462B62D | 48:8B03                    | mov rax,qword ptr ds:[rbx]                            |
+	00007FFB3462B630 | 33D2                       | xor edx,edx                                           |
+	00007FFB3462B632 | 48:8BCB                    | mov rcx,rbx                                           |
+	00007FFB3462B635 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462B639 | 5B                         | pop rbx                                               |
+	00007FFB3462B63A | 48:FFA0 C0000000           | jmp qword ptr ds:[rax+0xC0]                           |
+	*/
 	auto FindDeclaredClass( const char* name ) -> CSchemaClassBinding*
 	{
 		VirtualFn( CSchemaClassBinding* )( CSchemaSystemTypeScope* , const char* );
 		return vget< Fn >( this , index::CSchemaSystemTypeScope::FindDeclaredClass )( this , name );
 	}
+	/*
+	00007FFB3462E7F0 | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+	00007FFB3462E7F3 | 48:FFA0 D8000000           | jmp qword ptr ds:[rax+0xD8]                           |
+
+	00007FFB3462B6B0 | 40:53                      | push rbx                                              |
+	00007FFB3462B6B2 | 48:83EC 20                 | sub rsp,0x20                                          |
+	00007FFB3462B6B6 | 4C:8BCA                    | mov r9,rdx                                            |
+	00007FFB3462B6B9 | 48:8BD9                    | mov rbx,rcx                                           |
+	00007FFB3462B6BC | 48:85D2                    | test rdx,rdx                                          |
+	00007FFB3462B6BF | 74 3C                      | je schemasystem.7FFB3462B6FD                          |
+	00007FFB3462B6C1 | 803A 00                    | cmp byte ptr ds:[rdx],0x0                             |
+	00007FFB3462B6C4 | 74 37                      | je schemasystem.7FFB3462B6FD                          |
+	00007FFB3462B6C6 | 48:83C8 FF                 | or rax,0xFFFFFFFFFFFFFFFF                             |
+	00007FFB3462B6CA | 66:0F1F4400 00             | nop word ptr ds:[rax+rax],ax                          |
+	00007FFB3462B6D0 | 48:FFC0                    | inc rax                                               |
+	00007FFB3462B6D3 | 803C02 00                  | cmp byte ptr ds:[rdx+rax],0x0                         |
+	00007FFB3462B6D7 | 75 F7                      | jne schemasystem.7FFB3462B6D0                         |
+	00007FFB3462B6D9 | 41:B8 EDFEADBA             | mov r8d,0xBAADFEED                                    |
+	00007FFB3462B6DF | 8BD0                       | mov edx,eax                                           |
+	00007FFB3462B6E1 | 49:8BC9                    | mov rcx,r9                                            |
+	00007FFB3462B6E4 | E8 67540200                | call <schemasystem.sub_7FFB34650B50>                  |
+	00007FFB3462B6E9 | 8BD0                       | mov edx,eax                                           |
+	00007FFB3462B6EB | 48:8BCB                    | mov rcx,rbx                                           |
+	00007FFB3462B6EE | 48:8B03                    | mov rax,qword ptr ds:[rbx]                            |
+	00007FFB3462B6F1 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462B6F5 | 5B                         | pop rbx                                               |
+	00007FFB3462B6F6 | 48:FFA0 D0000000           | jmp qword ptr ds:[rax+0xD0]                           |
+	00007FFB3462B6FD | 48:8B03                    | mov rax,qword ptr ds:[rbx]                            |
+	00007FFB3462B700 | 33D2                       | xor edx,edx                                           |
+	00007FFB3462B702 | 48:8BCB                    | mov rcx,rbx                                           |
+	00007FFB3462B705 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462B709 | 5B                         | pop rbx                                               |
+	00007FFB3462B70A | 48:FFA0 D0000000           | jmp qword ptr ds:[rax+0xD0]                           |
+	*/
+	// DOTAKeybindCommand_t etc
 	auto FindDeclaredEnum( const char* name ) -> CSchemaEnumBinding*
 	{
 		VirtualFn( CSchemaEnumBinding* )( CSchemaSystemTypeScope* , const char* );
 		return vget< Fn >( this , index::CSchemaSystemTypeScope::FindDeclaredEnum )( this , name );
 	}
+	/*
+	48 89 5C 24 08 57 48 8B DA 48 8B F9 48 85 D2 74 76
+	*/
+	// float32,uint32 etc
 	auto FindSchemaTypeByName( const char* name ) -> CSchemaType*
 	{
 		VirtualFn( CSchemaType* )( CSchemaSystemTypeScope* , const char* );
 		return vget< Fn >( this , index::CSchemaSystemTypeScope::FindSchemaTypeByName )( this , name );
-	}
-	auto FindType_DeclaredClass( const char* name ) -> CSchemaType*
-	{
-		VirtualFn( CSchemaType* )( CSchemaSystemTypeScope* , const char* );
-		return vget< Fn >( this , index::CSchemaSystemTypeScope::FindType_DeclaredClass )( this , name );
-	}
-	auto FindType_DeclaredEnum( const char* name ) -> CSchemaType*
-	{
-		VirtualFn( CSchemaType* )( CSchemaSystemTypeScope* , const char* );
-		return vget< Fn >( this , index::CSchemaSystemTypeScope::FindType_DeclaredEnum )( this , name );
-	}
-	auto GetScopeName() -> const char*
-	{
-		VirtualFn( const char* )( CSchemaSystemTypeScope* );
-		return vget< Fn >( this , index::CSchemaSystemTypeScope::GetScopeName )( this );
-	}
-	auto IsGlobalScope() -> bool
-	{
-		VirtualFn( bool )( CSchemaSystemTypeScope* );
-		return vget< Fn >( this , index::CSchemaSystemTypeScope::IsGlobalScope )( this );
 	}
 
 	// schema_all_list_bindings function
@@ -294,6 +417,30 @@ public:
 		VirtualFn( CSchemaSystemTypeScope* )( CSchemaSystem* );
 		return vget< Fn >( this , index::CSchemaSystem::GlobalTypeScope )( this );
 	}
+	/*
+	00007FFB3462BDE0 | 40:53                      | push rbx                                              |
+	00007FFB3462BDE2 | 48:83EC 20                 | sub rsp,0x20                                          |
+	00007FFB3462BDE6 | 48:8BD9                    | mov rbx,rcx                                           |
+	00007FFB3462BDE9 | 4C:8BC2                    | mov r8,rdx                                            |
+	00007FFB3462BDEC | 48:81C1 30440000           | add rcx,0x4430                                        |
+	00007FFB3462BDF3 | 48:8D5424 30               | lea rdx,qword ptr ss:[rsp+0x30]                       |
+	00007FFB3462BDF8 | E8 53580200                | call <schemasystem.sub_7FFB34651650>                  |
+	00007FFB3462BDFD | 0FB708                     | movzx ecx,word ptr ds:[rax]                           |
+	00007FFB3462BE00 | B8 FFFF0000                | mov eax,0xFFFF                                        |
+	00007FFB3462BE05 | 66:3BC8                    | cmp cx,ax                                             |
+	00007FFB3462BE08 | 75 0F                      | jne schemasystem.7FFB3462BE19                         |
+	00007FFB3462BE0A | 48:8B03                    | mov rax,qword ptr ds:[rbx]                            |
+	00007FFB3462BE0D | 48:8BCB                    | mov rcx,rbx                                           |
+	00007FFB3462BE10 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462BE14 | 5B                         | pop rbx                                               |
+	00007FFB3462BE15 | 48:FF60 58                 | jmp qword ptr ds:[rax+0x58]                           |
+	00007FFB3462BE19 | 48:8B83 20440000           | mov rax,qword ptr ds:[rbx+0x4420]                     |
+	00007FFB3462BE20 | 0FB7C9                     | movzx ecx,cx                                          |
+	00007FFB3462BE23 | 48:8B04C8                  | mov rax,qword ptr ds:[rax+rcx*8]                      |
+	00007FFB3462BE27 | 48:83C4 20                 | add rsp,0x20                                          |
+	00007FFB3462BE2B | 5B                         | pop rbx                                               |
+	00007FFB3462BE2C | C3                         | ret                                                   |
+	*/
 	auto FindTypeScopeForModule( const char* szModuleName ) -> CSchemaSystemTypeScope*
 	{
 		VirtualFn( CSchemaSystemTypeScope* )( CSchemaSystem* , const char* );

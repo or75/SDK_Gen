@@ -1,5 +1,7 @@
 #pragma once
 
+#define ENGINE_DLL					"engine2.dll"
+#define CLIENT_DLL					"client.dll"
 #define SCHEMASYSTEM_DLL			"schemasystem.dll"
 #define INTERFACE_SCHEMASYSTEM		"SchemaSystem_001"
 
@@ -8,6 +10,8 @@
 
 namespace GeneratorOffset
 {
+	constexpr auto PATTERN_ClassEnum = "E8 ? ? ? ? 4C 8D 44 24 30 48 8B D6 48 8B CB 8B E8 E8 ? ? ? ?";
+
 	constexpr auto GetNumSchema = 0xC;
 
 	/*
@@ -63,21 +67,13 @@ namespace GeneratorOffset
 	constexpr auto GetEnumContainer = 0x2540;
 }
 
-enum kOffsetType_t
+struct VMT_IndexList_t
 {
-	kOffsetType_INT ,
-	kOffsetType_PTR,
-};
-
-struct OffsetList_t
-{
+	string m_sDll = "";
 	string m_sOffsetName = "";
 	string m_sOffsetPattern = "";
 
-	kOffsetType_t m_eOffsetType = kOffsetType_INT;
-
-	uint32_t m_uFoundIntOffset = 0;
-	uint64_t m_uFoundPtrOffset = 0;
+	uint32_t m_uDefaultIndex = 0;
 };
 
-extern vector<OffsetList_t> m_vDotaOffsetList;
+extern vector<VMT_IndexList_t> m_vDotaOffsetList;

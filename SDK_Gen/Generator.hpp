@@ -5,7 +5,7 @@
 #include "Dota/DataBase.hpp"
 #include "Components/DebugLog.hpp"
 
-#define DUMP_SCHEMA_ALL 1
+#define DUMP_SCHEMA_ALL 0
 
 class SDK_Generator
 {
@@ -17,6 +17,10 @@ public:
 
 	auto DumpAllEnumList( CSchemaSystemTypeScope* Scope ) -> void;
 	auto DumpAllClassList( CSchemaSystemTypeScope* Scope ) -> void;
+
+	auto DumpEnumClassOffset() -> bool;
+
+	auto Find_DotaVMT_Index() -> void;
 
 private:
 	// Dll Directory

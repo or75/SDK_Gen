@@ -1,6 +1,15 @@
 #include "Generator.hpp"
 
-vector<OffsetList_t> m_vDotaOffsetList;
+vector<VMT_IndexList_t> m_vDotaOffsetList =
+{
+	{ CLIENT_DLL , "PrepareUnitOrders" , index::C_DOTAPlayer::PATTERN_PrepareUnitOrders, index::C_DOTAPlayer::PrepareUnitOrders },
+	{ CLIENT_DLL , "CreateMove" , index::C_DOTAPlayer::PATTERN_CreateMove, index::C_DOTAPlayer::CreateMove },
+	{ ENGINE_DLL , "GetMaxClients" , index::IEngineClient::PATTERN_GetMaxClients, index::IEngineClient::GetMaxClients },
+	{ CLIENT_DLL , "IsInGame" , index::IEngineClient::PATTERN_IsInGame, index::IEngineClient::IsInGame },
+	{ CLIENT_DLL , "Con_NPrintf" , index::IEngineClient::PATTERN_Con_NPrintf, index::IEngineClient::Con_NPrintf },
+	{ CLIENT_DLL , "GetNetChannelInfo" , index::IEngineClient::PATTERN_GetNetChannelInfo, index::IEngineClient::GetNetChannelInfo },
+	{ CLIENT_DLL , "ClientCmd_Unrestricted" , index::IEngineClient::PATTERN_ClientCmd_Unrestricted, index::IEngineClient::ClientCmd_Unrestricted },
+};
 
 SDK_Generator::SDK_Generator( HINSTANCE hinstDLL )
 {
@@ -19,7 +28,7 @@ SDK_Generator::~SDK_Generator()
 {
 	if ( m_pLog )
 	{
-		m_pLog->WriteDebugLog( "[SDK-Gen] End\n" );
+		m_pLog->WriteDebugLog( "\n[SDK-Gen] End\n" );
 		delete m_pLog;
 	}
 }
@@ -29,7 +38,7 @@ auto SDK_Generator::Generate() -> void
 	if ( !m_pLog )
 		return;
 
-	m_pLog->WriteDebugLog( "[SDK-Gen] Start\n" );
+	m_pLog->WriteDebugLog( "[SDK-Gen] Start\n\n" );
 
 	while ( !GetModuleHandleA(  "navsystem.dll" ) )
 		Sleep( 1000 );
@@ -46,6 +55,11 @@ auto SDK_Generator::Generate() -> void
 
 	m_pLog->WriteDebugLog( "[SDK-Gen] m_pSchemaSystem: %p\n" , m_pSchemaSystem );
 	m_pLog->WriteDebugLog( "\n" );
+
+	if ( !DumpEnumClassOffset() )
+		return;
+
+	Find_DotaVMT_Index();
 
 #if DUMP_SCHEMA_ALL == 1
 
@@ -69,6 +83,8 @@ auto SDK_Generator::Generate() -> void
 			DumpAllClassList( Scope );
 		}
 	}
+
+	return;
 
 #endif
 }
@@ -178,6 +194,86 @@ auto SDK_Generator::DumpAllClassList( CSchemaSystemTypeScope* Scope ) -> void
 
 				m_pLog->WriteDebugLog( "};\n\n" );
 			}
+		}
+	}
+}
+
+auto SDK_Generator::DumpEnumClassOffset() -> bool
+{
+	auto pClassEnumFunction = (uint64_t)FindPattern( SCHEMASYSTEM_DLL , GeneratorOffset::PATTERN_ClassEnum );
+
+	if ( pClassEnumFunction )
+	{
+		m_pLog->WriteDebugLog( "[SDK-Gen] pClassEnumFunction: %p\n" , pClassEnumFunction );
+
+		auto pClassFunction = GetCallFunction( pClassEnumFunction );
+		auto pEnumFunction = GetCallFunction( pClassEnumFunction + 0x12 );
+
+		m_pLog->WriteDebugLog( "[SDK-Gen] pClassFunction: %p\n" , pClassFunction );
+		m_pLog->WriteDebugLog( "[SDK-Gen] pEnumFunction: %p\n\n" , pEnumFunction );
+		
+		auto pClassOffset = pClassFunction + 0x4E + 0x3;
+		auto pEnumOffset = pEnumFunction + 0x4E + 0x3;
+		auto pNumOffset = pClassFunction + 0x17 + 0x3;
+
+		auto GetNumSchema = *(uint8_t*)pNumOffset - *(uint8_t*)pClassOffset;
+		auto GetClassContainer = *(uint32_t*)pClassOffset;
+		auto GetEnumContainer = *(uint32_t*)pEnumOffset;
+
+		auto Update = false;
+
+		if ( GetNumSchema != GeneratorOffset::GetNumSchema )
+		{
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetNumSchema: %X\n" , GetNumSchema );
+			Update = true;
+		}
+
+		if ( GetClassContainer != GeneratorOffset::GetClassContainer )
+		{
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetClassContainer: %X\n" , GetClassContainer );
+			Update = true;
+		}
+
+		if ( GetEnumContainer != GeneratorOffset::GetEnumContainer )
+		{
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetEnumContainer: %X\n" , GetEnumContainer );
+			Update = true;
+		}
+
+		if ( Update )
+			return false;
+
+		m_pLog->WriteDebugLog( "[SDK-Gen] DumpEnumClassOffset OK\n\n" );
+
+		return true;
+	}
+	else
+	{
+		m_pLog->WriteDebugLog( "[SDK-Gen] ERROR: pClassEnumFunction\n" );
+	}
+
+	return false;
+}
+
+auto SDK_Generator::Find_DotaVMT_Index() -> void
+{
+	for ( auto& offset : m_vDotaOffsetList )
+	{
+		auto pFoundCall = (uint64_t)FindPattern( offset.m_sDll.c_str() , offset.m_sOffsetPattern.c_str() );
+
+		if ( pFoundCall )
+		{
+			auto pNewIndex = *(uint32_t*)( pFoundCall + 2 ) / sizeof( uint64_t );
+
+			if ( pNewIndex != offset.m_uDefaultIndex )
+			{
+				m_pLog->WriteDebugLog( "[SDK-Gen] NEW INDEX -> %s %i\n" , offset.m_sOffsetName.c_str() , pNewIndex );
+			}
+		}
+		else
+		{
+			m_pLog->WriteDebugLog( "[SDK-Gen] ERROR: %s -> %s\n" , offset.m_sDll.c_str() , offset.m_sOffsetName.c_str() );
+			break;
 		}
 	}
 }

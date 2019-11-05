@@ -19,3 +19,5 @@ inline auto vget( PVOID instance , unsigned int index ) -> T
 
 auto FindPattern( const char* pattern , uint64_t start , uint64_t end , uint32_t offset = 0 , uint32_t read = 0 ) -> PVOID;
 auto FindPattern( const char* module_name , const char* pattern , uint32_t offset = 0 , uint32_t read = 0 ) -> PVOID;
+
+auto GetCallFunction( uint64_t address , uint32_t offset = 1 , uint32_t size = 5 ) -> uint64_t;
