@@ -74,6 +74,7 @@ struct VMT_IndexList_t
 	string m_sOffsetPattern = "";
 
 	uint32_t m_uDefaultIndex = 0;
+	bool m_bOneByteCall = false;
 };
 
 extern vector<VMT_IndexList_t> m_vDotaOffsetList;

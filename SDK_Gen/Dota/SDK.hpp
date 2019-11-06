@@ -23,9 +23,8 @@ namespace index
 		constexpr auto PATTERN_CreateMove = "FF 90 ? ? ? ? 48 8B 5C 24 38 48 8B 74 24 40 48 83 C4 20 5F C3 48 89 5C 24 10";
 
 		/*
-		// PrepareUnitOrders
-		// FF 90 ? ? ? ? 45 33 C0 33 D2 48 8B CF E8 ? ? ? ? E9 ? ? ? ? CC
-		00007FFAF905AEC3 | FF90 580D0000              | call qword ptr ds:[rax+0xD58]                         |
+		// PATTERN:
+		00007FFAF905AEC3 | FF90 580D0000              | call qword ptr ds:[rax+0xD58]                         | // offset
 		00007FFAF905AEC9 | 45:33C0                    | xor r8d,r8d                                           |
 		00007FFAF905AECC | 33D2                       | xor edx,edx                                           |
 		00007FFAF905AECE | 48:8BCF                    | mov rcx,rdi                                           |
@@ -35,15 +34,17 @@ namespace index
 		*/
 		constexpr auto PrepareUnitOrders = 427;
 
-		// FF 90 ? ? ? ? 48 8B 5C 24 38 48 8B 74 24 40 48 83 C4 20 5F C3 48 89 5C 24 10
 		/*
-		00007FFAF8F6826A | FF90 200A0000              | call qword ptr ds:[rax+0xA20]                         |
+		// PATTERN:
+		00007FFAF8F6826A | FF90 200A0000              | call qword ptr ds:[rax+0xA20]                         | // offset
 		00007FFAF8F68270 | 48:8B5C24 38               | mov rbx,qword ptr ss:[rsp+0x38]                       |
 		00007FFAF8F68275 | 48:8B7424 40               | mov rsi,qword ptr ss:[rsp+0x40]                       |
 		00007FFAF8F6827A | 48:83C4 20                 | add rsp,0x20                                          |
 		00007FFAF8F6827E | 5F                         | pop rdi                                               |
 		00007FFAF8F6827F | C3                         | ret                                                   |
 		00007FFAF8F68280 | 48:895C24 10               | mov qword ptr ss:[rsp+0x10],rbx                       |
+		// FUNCTION: 
+		48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 30 8B ? ? ? ? ? 48 8B DA 48 8B F1 83 F8 FD
 		*/
 		constexpr auto CreateMove = 324;
 	}
@@ -54,8 +55,11 @@ namespace index
 		constexpr auto PATTERN_Con_NPrintf = "FF 90 ? ? ? ? 44 ? ? ? ? ? ? ? ? 44 ? ? ? ? ? ? ? ? F3 44 0F 11 54 33 30";
 		constexpr auto PATTERN_GetNetChannelInfo = "FF 90 ? ? ? ? 48 8B D8 ? ? ? ? ? ? ? 48 85 C0";
 		constexpr auto PATTERN_ClientCmd_Unrestricted = "FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 8B 01 48 83 C4 28 48 ? ? ? ? ? ? CC CC CC 48 89 5C 24 08";
+		constexpr auto PATTERN_GetScreenSize = "FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 40 0F 95 C5";
+		constexpr auto PATTERN_GetLevelName = "FF 90 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 80 38 00 0F 84 ? ? ? ? ? ? ? ? ? ? ? 48 85 C9 74 0A 48 8B 01";
 
 		/*
+		// PATTERN:
 		00007FFB0AB47BA8:"unpause\n"
 		...
 		00007FFB0A79735B | FF92 C8000000              | call qword ptr ds:[rdx+0xC8]                          | [rdx+C8]:sub_7FFB0A73BF60 offset
@@ -67,6 +71,7 @@ namespace index
 		*/
 		constexpr auto GetMaxClients = 25;
 		/*
+		// PATTERN:
 		00007FFAF9587EAF | FF90 D0000000              | call qword ptr ds:[rax+0xD0]                          | [rax+D0]:sub_7FFB0A73C020 offset
 		00007FFAF9587EB5 | 3A86 98010000              | cmp al,byte ptr ds:[rsi+0x198]                        |
 		00007FFAF9587EBB | 74 1F                      | je client.7FFAF9587EDC                                |
@@ -76,6 +81,7 @@ namespace index
 		*/
 		constexpr auto IsInGame = 26;
 		/*
+		// PATTERN:
 		00007FFAF8F6545D | 4C:8D05 8CC61301           | lea r8,qword ptr ds:[0x7FFAFA0A1AF0]                  | 00007FFAFA0A1AF0:"Pitch: %6.1f   Yaw: %6.1f   Dist: %6.1f %16s"
 		00007FFAF8F65464 | F3:0F104C33 34             | movss xmm1,dword ptr ds:[rbx+rsi+0x34]                |
 		00007FFAF8F6546A | 48:8B0D CF3E1202           | mov rcx,qword ptr ds:[0x7FFAFB089340]                 |
@@ -92,6 +98,7 @@ namespace index
 		*/
 		constexpr auto Con_NPrintf = 28;
 		/*
+		// PATTERN:
 		00007FFAF9F07DC0:"PanoramaUI"
 		00007FFAFA9838A8:"CDOTA_Hud_NetGraph::Update"
 		...
@@ -102,6 +109,7 @@ namespace index
 		*/
 		constexpr auto GetNetChannelInfo = 30;
 		/*
+		// PATTERN:
 		00007FFAF8FA2501 | 48:8D15 40D21001           | lea rdx,qword ptr ds:[0x7FFAFA0AF748]                 | 00007FFAFA0AF748:"host_timescale 0"
 		00007FFAF8FA2508 | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
 		00007FFAF8FA250B | FF90 20010000              | call qword ptr ds:[rax+0x120]                         |
@@ -118,10 +126,62 @@ namespace index
 		00007FFAF8FA2536 | 48:83EC 20                 | sub rsp,0x20                                          |
 		00007FFAF8FA253A | 48:8D05 67F31001           | lea rax,qword ptr ds:[<&sub_7FFAF8FA2580>]            |
 		*/
-		constexpr auto ClientCmd_Unrestricted = 36; // FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 8B 01 48 83 C4 28 48 ? ? ? ? ? ? CC CC CC 48 89 5C 24 08
+		constexpr auto ClientCmd_Unrestricted = 36;
+		/*
+		// PATTERN:
+		00007FFAF908E110 | 48:895C24 08               | mov qword ptr ss:[rsp+0x8],rbx                        |
+		00007FFAF908E115 | 48:896C24 10               | mov qword ptr ss:[rsp+0x10],rbp                       |
+		00007FFAF908E11A | 48:897424 18               | mov qword ptr ss:[rsp+0x18],rsi                       |
+		00007FFAF908E11F | 48:897C24 20               | mov qword ptr ss:[rsp+0x20],rdi                       |
+		00007FFAF908E124 | 41:56                      | push r14                                              |
+		00007FFAF908E126 | 48:83EC 20                 | sub rsp,0x20                                          |
+		00007FFAF908E12A | 48:8B5C24 50               | mov rbx,qword ptr ss:[rsp+0x50]                       |
+		00007FFAF908E12F | 48:8BF9                    | mov rdi,rcx                                           |
+		00007FFAF908E132 | 48:8B0D 07B2FF01           | mov rcx,qword ptr ds:[0x7FFAFB089340]                 |
+		00007FFAF908E139 | 49:8BF0                    | mov rsi,r8                                            |
+		00007FFAF908E13C | 45:33F6                    | xor r14d,r14d                                         |
+		00007FFAF908E13F | 4C:8BC3                    | mov r8,rbx                                            |
+		00007FFAF908E142 | 44:8932                    | mov dword ptr ds:[rdx],r14d                           |
+		00007FFAF908E145 | 49:8BD1                    | mov rdx,r9                                            |
+		00007FFAF908E148 | 48:8B01                    | mov rax,qword ptr ds:[rcx]                            |
+		00007FFAF908E14B | FF90 70010000              | call qword ptr ds:[rax+0x170]                         | [rax+170]:sub_7FFB0A73BA20 offset
+		00007FFAF908E151 | 44:3835 F829FB01           | cmp byte ptr ds:[0x7FFAFB040B50],r14b                 |
+		00007FFAF908E158 | 48:8D0D 5130FB01           | lea rcx,qword ptr ds:[0x7FFAFB0411B0]                 |
+		00007FFAF908E15F | 40:0F95C5                  | setne bpl                                             |
+		00007FFAF908E163 | E8 080D0B00                | call <client.sub_7FFAF913EE70>                        |
+		*/
 		constexpr auto GetScreenSize = 46;
+		/*
+		// FUNCTION: 48 83 EC 28 E8 ? ? ? ? 84 C0 74 0C ? ? ? ? ? ? ? 48 83 C4 28 C3
+		00007FFB0A73C1B0 | 48:83EC 28                 | sub rsp,0x28                                          |
+		00007FFB0A73C1B4 | E8 D7B32800                | call <engine2.sub_7FFB0A9C7590>                       |
+		00007FFB0A73C1B9 | 84C0                       | test al,al                                            |
+		00007FFB0A73C1BB | 74 0C                      | je engine2.7FFB0A73C1C9                               |
+		00007FFB0A73C1BD | 48:8D05 7C973F00           | lea rax,qword ptr ds:[0x7FFB0AB35940]                 | 00007FFB0AB35940:"Dedicated Server"
+		00007FFB0A73C1C4 | 48:83C4 28                 | add rsp,0x28                                          |
+		00007FFB0A73C1C8 | C3                         | ret                                                   |
+		*/
 		constexpr auto GetLevelName = 49;
-		constexpr auto GetLevelNameShort = 50;
+		constexpr auto GetLevelNameShort = GetLevelName + 1;
+	}
+	namespace CGameEntitySystem
+	{
+		constexpr auto PATTERN_OnAddEntity = "FF 50 ? C6 05 ? ? ? ? ? 48 8B 0B";
+
+		/*
+		FUNCTION: 48 89 5C 24 10 56 48 83 EC 20 48 8B D9 41 8B C0 B9 ? ? ? ? 48 8B F2 23 C1 41 83 F8 FF
+		00007FFAF8E88E70 | 48:895C24 10               | mov qword ptr ss:[rsp+0x10],rbx                       |
+		00007FFAF8E88E75 | 56                         | push rsi                                              |
+		00007FFAF8E88E76 | 48:83EC 20                 | sub rsp,0x20                                          |
+		00007FFAF8E88E7A | 48:8BD9                    | mov rbx,rcx                                           |
+		00007FFAF8E88E7D | 41:8BC0                    | mov eax,r8d                                           |
+		00007FFAF8E88E80 | B9 FF7F0000                | mov ecx,0x7FFF                                        |
+		00007FFAF8E88E85 | 48:8BF2                    | mov rsi,rdx                                           |
+		00007FFAF8E88E88 | 23C1                       | and eax,ecx                                           |
+		00007FFAF8E88E8A | 41:83F8 FF                 | cmp r8d,0xFFFFFFFF                                    |
+		*/
+		constexpr auto OnAddEntity = 14;
+		constexpr auto OnRemoveEntity = OnAddEntity + 1;
 	}
 }
 

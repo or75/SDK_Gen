@@ -9,6 +9,7 @@ vector<VMT_IndexList_t> m_vDotaOffsetList =
 	{ CLIENT_DLL , "Con_NPrintf" , index::IEngineClient::PATTERN_Con_NPrintf, index::IEngineClient::Con_NPrintf },
 	{ CLIENT_DLL , "GetNetChannelInfo" , index::IEngineClient::PATTERN_GetNetChannelInfo, index::IEngineClient::GetNetChannelInfo },
 	{ CLIENT_DLL , "ClientCmd_Unrestricted" , index::IEngineClient::PATTERN_ClientCmd_Unrestricted, index::IEngineClient::ClientCmd_Unrestricted },
+	{ CLIENT_DLL , "OnAddEntity" , index::CGameEntitySystem::PATTERN_OnAddEntity, index::CGameEntitySystem::OnAddEntity , true },
 };
 
 SDK_Generator::SDK_Generator( HINSTANCE hinstDLL )
@@ -263,7 +264,8 @@ auto SDK_Generator::Find_DotaVMT_Index() -> void
 
 		if ( pFoundCall )
 		{
-			auto pNewIndex = *(uint32_t*)( pFoundCall + 2 ) / sizeof( uint64_t );
+			auto pCallOffset = offset.m_bOneByteCall ? *(uint8_t*)( pFoundCall + 2 ) : *(uint32_t*)( pFoundCall + 2 );
+			auto pNewIndex = pCallOffset / sizeof( uint64_t );
 
 			if ( pNewIndex != offset.m_uDefaultIndex )
 			{
