@@ -185,11 +185,12 @@ auto SDK_Generator::DumpAllClassList( CSchemaSystemTypeScope* Scope ) -> void
 
 				for ( auto idx = 0; idx < binding->size; idx++ )
 				{
+					//auto class_ptr = &binding->m_DataArray[idx];
 					auto class_data = binding->m_DataArray[idx];
 
 					if ( class_data.FieldName && class_data.FieldType )
 					{
-						m_pLog->WriteDebugLog( "\t%s %s; // 0x%04X\n" , class_data.FieldType->szTypeName , class_data.FieldName , class_data.FieldOffset );
+						m_pLog->WriteDebugLog( "\t%s %s; // 0x%04X\n" , class_data.FieldType->szTypeName , class_data.FieldName , class_data.FieldOffset /*, class_ptr*/ );
 					}
 				}
 

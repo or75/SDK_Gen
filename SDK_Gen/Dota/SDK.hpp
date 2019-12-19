@@ -32,7 +32,7 @@ namespace index
 		00007FFAF905AED6 | E9 25FCFFFF                | jmp client.7FFAF905AB00                               |
 		00007FFAF905AEDB | CC                         | int3                                                  |
 		*/
-		constexpr auto PrepareUnitOrders = 427;
+		constexpr auto PrepareUnitOrders = 428;
 
 		/*
 		// PATTERN:
@@ -46,7 +46,7 @@ namespace index
 		// FUNCTION: 
 		48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 30 8B ? ? ? ? ? 48 8B DA 48 8B F1 83 F8 FD
 		*/
-		constexpr auto CreateMove = 324;
+		constexpr auto CreateMove = 325;
 	}
 	namespace IEngineClient
 	{
@@ -287,6 +287,7 @@ public:
 class CSchemaType
 {
 public:
+	void* ptable;
 	char* szTypeName;
 };
 

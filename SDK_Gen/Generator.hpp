@@ -5,7 +5,7 @@
 #include "Dota/DataBase.hpp"
 #include "Components/DebugLog.hpp"
 
-#define DUMP_SCHEMA_ALL 0
+#define DUMP_SCHEMA_ALL 1
 
 class SDK_Generator
 {
