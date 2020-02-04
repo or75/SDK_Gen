@@ -76,7 +76,7 @@ auto SDK_Generator::Generate() -> void
 		CSchemaSystemTypeScope* Scope = nullptr;
 
 		DumpAllEnumList( GobalScope );
-		//DumpAllClassList( GobalScope );
+		DumpAllClassList( GobalScope );
 
 #if DEBUG_SCHEMA == 1
 
@@ -87,7 +87,7 @@ auto SDK_Generator::Generate() -> void
 		while ( ( Scope = AllScope[idx++] ) )
 		{
 			DumpAllEnumList( Scope );
-			//DumpAllClassList( Scope );
+			DumpAllClassList( Scope );
 		}
 	}
 
