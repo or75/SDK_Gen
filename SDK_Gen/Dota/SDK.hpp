@@ -46,7 +46,7 @@ namespace index
 		// FUNCTION: 
 		48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 30 8B ? ? ? ? ? 48 8B DA 48 8B F1 83 F8 FD
 		*/
-		constexpr auto CreateMove = 325;
+		constexpr auto CreateMove = 327;
 	}
 	namespace IEngineClient
 	{
@@ -314,8 +314,8 @@ public:
 		SchemaBlock* GetFirstBlock() const {
 			return m_firstBlock;
 		}
-	private:
-		void* unkn0[3];
+	public:
+		void* unkn0[4];
 		SchemaBlock* m_firstBlock;
 	};
 

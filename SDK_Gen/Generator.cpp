@@ -2,7 +2,7 @@
 
 vector<VMT_IndexList_t> m_vDotaOffsetList =
 {
-	{ CLIENT_DLL , "PrepareUnitOrders" , index::C_DOTAPlayer::PATTERN_PrepareUnitOrders, index::C_DOTAPlayer::PrepareUnitOrders },
+	//{ CLIENT_DLL , "PrepareUnitOrders" , index::C_DOTAPlayer::PATTERN_PrepareUnitOrders, index::C_DOTAPlayer::PrepareUnitOrders },
 	{ CLIENT_DLL , "CreateMove" , index::C_DOTAPlayer::PATTERN_CreateMove, index::C_DOTAPlayer::CreateMove },
 	{ ENGINE_DLL , "GetMaxClients" , index::IEngineClient::PATTERN_GetMaxClients, index::IEngineClient::GetMaxClients },
 	{ CLIENT_DLL , "IsInGame" , index::IEngineClient::PATTERN_IsInGame, index::IEngineClient::IsInGame },
@@ -76,12 +76,18 @@ auto SDK_Generator::Generate() -> void
 		CSchemaSystemTypeScope* Scope = nullptr;
 
 		DumpAllEnumList( GobalScope );
-		DumpAllClassList( GobalScope );
+		//DumpAllClassList( GobalScope );
+
+#if DEBUG_SCHEMA == 1
+
+		m_pLog->WriteDebugLog( "\nAllScope DUMP:\n\n" );
+
+#endif
 
 		while ( ( Scope = AllScope[idx++] ) )
 		{
 			DumpAllEnumList( Scope );
-			DumpAllClassList( Scope );
+			//DumpAllClassList( Scope );
 		}
 	}
 
@@ -94,14 +100,34 @@ auto SDK_Generator::DumpAllEnumList( CSchemaSystemTypeScope* Scope ) -> void
 {
 	auto enum_container = Scope->GetEnumContainer();
 
+#if DEBUG_SCHEMA == 1
+	m_pLog->WriteDebugLog( "enum_container: %p\n" , enum_container );
+	MessageBoxA( 0 , "enum_container" , "enum_container" , MB_ICONERROR );
+#endif
+
 	if ( enum_container )
 	{
 		int blockIndex = 0;
 
+#if DEBUG_SCHEMA == 1
+		m_pLog->WriteDebugLog( "GetBlockContainers: %p\n" , &enum_container->GetBlockContainers() );
+#endif
+
 		for ( auto& schema_block : enum_container->GetBlockContainers() )
 		{
+
+#if DEBUG_SCHEMA == 1
+			m_pLog->WriteDebugLog( "schema_block: %p , %p , %p\n" , &schema_block , schema_block.GetFirstBlock() , schema_block.m_firstBlock );
+#endif
+
 			for ( auto block = schema_block.GetFirstBlock(); block && blockIndex < enum_container->GetNumSchema(); block = block->Next() , ++blockIndex )
 			{
+
+#if DEBUG_SCHEMA == 1
+				m_pLog->WriteDebugLog( "block: %p -> %p -> %p\n" , block , block->GetBinding() , block->Next() );
+				MessageBoxA( 0 , "block" , "block" , MB_ICONERROR );
+#endif
+
 				auto binding = block->GetBinding();
 
 				if ( !binding )
@@ -226,19 +252,19 @@ auto SDK_Generator::DumpEnumClassOffset() -> bool
 
 		if ( GetNumSchema != GeneratorOffset::GetNumSchema )
 		{
-			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetNumSchema: %X\n" , GetNumSchema );
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetNumSchema: 0x%X\n" , GetNumSchema );
 			Update = true;
 		}
 
 		if ( GetClassContainer != GeneratorOffset::GetClassContainer )
 		{
-			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetClassContainer: %X\n" , GetClassContainer );
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetClassContainer: 0x%X\n" , GetClassContainer );
 			Update = true;
 		}
 
 		if ( GetEnumContainer != GeneratorOffset::GetEnumContainer )
 		{
-			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetEnumContainer: %X\n" , GetEnumContainer );
+			m_pLog->WriteDebugLog( "[SDK-Gen] NEW GetEnumContainer: 0x%X\n" , GetEnumContainer );
 			Update = true;
 		}
 

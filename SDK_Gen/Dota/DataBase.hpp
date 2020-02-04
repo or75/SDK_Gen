@@ -38,7 +38,7 @@ namespace GeneratorOffset
 	00007FFA05BB743A | 41:FF52 08                 | call qword ptr ds:[r10+0x8]                           |
 	00007FFA05BB743E | 48:8D8F 00050000           | lea rcx,qword ptr ds:[rdi+0x500]                      | GetClassContainer
 	*/
-	constexpr auto GetClassContainer = 0x500;
+	constexpr auto GetClassContainer = 0x558;
 
 	/*
 	00007FFA05BB7550 | 48:895C24 10               | mov qword ptr ss:[rsp+0x10],rbx                       |
@@ -64,7 +64,7 @@ namespace GeneratorOffset
 	00007FFA05BB759A | 41:FF52 08                 | call qword ptr ds:[r10+0x8]                           |
 	00007FFA05BB759E | 48:8D8F 40250000           | lea rcx,qword ptr ds:[rdi+0x2540]                     | GetEnumContainer
 	*/
-	constexpr auto GetEnumContainer = 0x2540;
+	constexpr auto GetEnumContainer = 0x2D98;
 }
 
 struct VMT_IndexList_t

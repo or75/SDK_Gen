@@ -6,6 +6,7 @@
 #include "Components/DebugLog.hpp"
 
 #define DUMP_SCHEMA_ALL 1
+#define DEBUG_SCHEMA	0
 
 class SDK_Generator
 {
