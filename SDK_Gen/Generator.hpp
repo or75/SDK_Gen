@@ -29,5 +29,5 @@ private:
 	// Log
 	DebugLog* m_pLog = nullptr;
 	// Schema System
-	CSchemaSystem* m_pSchemaSystem;
+	CSchemaSystem* m_pSchemaSystem = nullptr;
 };

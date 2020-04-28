@@ -17,37 +17,6 @@ namespace index
 		constexpr auto GlobalTypeScope = 11;
 		constexpr auto FindTypeScopeForModule = 13;
 	}
-	namespace C_DOTAPlayer
-	{
-		constexpr auto PATTERN_PrepareUnitOrders = "FF 90 ? ? ? ? 45 33 C0 33 D2 48 8B CF E8 ? ? ? ? E9 ? ? ? ? CC";
-		constexpr auto PATTERN_CreateMove = "FF 90 ? ? ? ? 48 8B 5C 24 38 48 8B 74 24 40 48 83 C4 20 5F C3 48 89 5C 24 10";
-
-		/*
-		// PATTERN:
-		00007FFAF905AEC3 | FF90 580D0000              | call qword ptr ds:[rax+0xD58]                         | // offset
-		00007FFAF905AEC9 | 45:33C0                    | xor r8d,r8d                                           |
-		00007FFAF905AECC | 33D2                       | xor edx,edx                                           |
-		00007FFAF905AECE | 48:8BCF                    | mov rcx,rdi                                           |
-		00007FFAF905AED1 | E8 FA73FFFF                | call <client.sub_7FFAF90522D0>                        |
-		00007FFAF905AED6 | E9 25FCFFFF                | jmp client.7FFAF905AB00                               |
-		00007FFAF905AEDB | CC                         | int3                                                  |
-		*/
-		constexpr auto PrepareUnitOrders = 428;
-
-		/*
-		// PATTERN:
-		00007FFAF8F6826A | FF90 200A0000              | call qword ptr ds:[rax+0xA20]                         | // offset
-		00007FFAF8F68270 | 48:8B5C24 38               | mov rbx,qword ptr ss:[rsp+0x38]                       |
-		00007FFAF8F68275 | 48:8B7424 40               | mov rsi,qword ptr ss:[rsp+0x40]                       |
-		00007FFAF8F6827A | 48:83C4 20                 | add rsp,0x20                                          |
-		00007FFAF8F6827E | 5F                         | pop rdi                                               |
-		00007FFAF8F6827F | C3                         | ret                                                   |
-		00007FFAF8F68280 | 48:895C24 10               | mov qword ptr ss:[rsp+0x10],rbx                       |
-		// FUNCTION: 
-		48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 30 8B ? ? ? ? ? 48 8B DA 48 8B F1 83 F8 FD
-		*/
-		constexpr auto CreateMove = 327;
-	}
 	namespace IEngineClient
 	{
 		constexpr auto PATTERN_GetMaxClients = "FF 92 ? ? ? ? 83 F8 01 7E 11";
@@ -314,7 +283,7 @@ public:
 		SchemaBlock* GetFirstBlock() const {
 			return m_firstBlock;
 		}
-	public:
+	private:
 		void* unkn0[4];
 		SchemaBlock* m_firstBlock;
 	};

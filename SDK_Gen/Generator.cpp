@@ -2,8 +2,6 @@
 
 vector<VMT_IndexList_t> m_vDotaOffsetList =
 {
-	//{ CLIENT_DLL , "PrepareUnitOrders" , index::C_DOTAPlayer::PATTERN_PrepareUnitOrders, index::C_DOTAPlayer::PrepareUnitOrders },
-	{ CLIENT_DLL , "CreateMove" , index::C_DOTAPlayer::PATTERN_CreateMove, index::C_DOTAPlayer::CreateMove },
 	{ ENGINE_DLL , "GetMaxClients" , index::IEngineClient::PATTERN_GetMaxClients, index::IEngineClient::GetMaxClients },
 	{ CLIENT_DLL , "IsInGame" , index::IEngineClient::PATTERN_IsInGame, index::IEngineClient::IsInGame },
 	{ CLIENT_DLL , "Con_NPrintf" , index::IEngineClient::PATTERN_Con_NPrintf, index::IEngineClient::Con_NPrintf },
