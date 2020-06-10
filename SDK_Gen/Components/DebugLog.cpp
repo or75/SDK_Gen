@@ -1,12 +1,14 @@
 #include "DebugLog.hpp"
 
-auto DebugLog::Create( string& szDllDir ) -> void
+auto LogFile::Create( string szDllDir , string CustomFile ) -> void
 {
-	m_sLogFilePath = szDllDir + "\\" + DEBUG_LOG_FILE;
+	filesystem::create_directory( szDllDir );
+
+	m_sLogFilePath = szDllDir + "\\" + CustomFile;
 	m_pFileHandle = _fsopen( m_sLogFilePath.c_str() , "a+" , SH_DENYNO );
 }
 
-auto DebugLog::WriteDebugLog( const char* sFormat , ... ) -> void
+auto LogFile::WriteDebugLog( const char* sFormat , ... ) -> void
 {
 	if ( m_pFileHandle )
 	{
@@ -29,7 +31,7 @@ auto DebugLog::WriteDebugLog( const char* sFormat , ... ) -> void
 	}
 }
 
-DebugLog::~DebugLog()
+LogFile::~LogFile()
 {
 	fclose( m_pFileHandle );
 	m_pFileHandle = nullptr;

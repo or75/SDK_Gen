@@ -1,26 +1,11 @@
 #include "Generator.hpp"
 
-vector<VMT_IndexList_t> m_vDotaOffsetList =
+SDK_Generator::SDK_Generator()
 {
-	{ ENGINE_DLL , "GetMaxClients" , index::IEngineClient::PATTERN_GetMaxClients, index::IEngineClient::GetMaxClients },
-	{ CLIENT_DLL , "IsInGame" , index::IEngineClient::PATTERN_IsInGame, index::IEngineClient::IsInGame },
-	{ CLIENT_DLL , "Con_NPrintf" , index::IEngineClient::PATTERN_Con_NPrintf, index::IEngineClient::Con_NPrintf },
-	{ CLIENT_DLL , "GetNetChannelInfo" , index::IEngineClient::PATTERN_GetNetChannelInfo, index::IEngineClient::GetNetChannelInfo },
-	{ CLIENT_DLL , "ClientCmd_Unrestricted" , index::IEngineClient::PATTERN_ClientCmd_Unrestricted, index::IEngineClient::ClientCmd_Unrestricted },
-	{ CLIENT_DLL , "OnAddEntity" , index::CGameEntitySystem::PATTERN_OnAddEntity, index::CGameEntitySystem::OnAddEntity , true },
-};
+	m_pLog = new LogFile();
+	m_pLog->Create( DllDir , DEBUG_LOG_FILE );
 
-SDK_Generator::SDK_Generator( HINSTANCE hinstDLL )
-{
-	char sDllDir[MAX_PATH] = { 0 };
-	
-	if ( GetModuleFileNameA( hinstDLL , sDllDir , MAX_PATH ) )
-	{
-		m_sDllDir = filesystem::path( sDllDir ).parent_path().string();
-
-		m_pLog = new DebugLog();
-		m_pLog->Create( m_sDllDir );
-	}
+	m_pIndexGenerator = new IndexFileGenerator();
 }
 
 SDK_Generator::~SDK_Generator()
@@ -39,7 +24,7 @@ auto SDK_Generator::Generate() -> void
 
 	m_pLog->WriteDebugLog( "[SDK-Gen] Start\n\n" );
 
-	while ( !GetModuleHandleA(  "navsystem.dll" ) )
+	while ( !GetModuleHandleA( "navsystem.dll" ) )
 		Sleep( 1000 );
 
 	Factory SchemaFactory( SCHEMASYSTEM_DLL );
@@ -53,12 +38,11 @@ auto SDK_Generator::Generate() -> void
 	}
 
 	m_pLog->WriteDebugLog( "[SDK-Gen] m_pSchemaSystem: %p\n" , m_pSchemaSystem );
-	m_pLog->WriteDebugLog( "\n" );
 
 	if ( !DumpEnumClassOffset() )
 		return;
 
-	Find_DotaVMT_Index();
+	m_pIndexGenerator->Generate();
 
 #if DUMP_SCHEMA_ALL == 1
 
@@ -281,9 +265,46 @@ auto SDK_Generator::DumpEnumClassOffset() -> bool
 	return false;
 }
 
-auto SDK_Generator::Find_DotaVMT_Index() -> void
+/*
+Index.hpp
+*/
+
+vector<VMT_IndexList_t> m_IEngineClient_IndexList =
 {
-	for ( auto& offset : m_vDotaOffsetList )
+	{ CLIENT_DLL , "IsInGame" , index::IEngineClient::PATTERN_IsInGame, index::IEngineClient::IsInGame },
+	{ CLIENT_DLL , "GetNetChannelInfo" , index::IEngineClient::PATTERN_GetNetChannelInfo, index::IEngineClient::GetNetChannelInfo },
+	{ CLIENT_DLL , "ClientCmd_Unrestricted" , index::IEngineClient::PATTERN_ClientCmd_Unrestricted, index::IEngineClient::ClientCmd_Unrestricted },
+	{ CLIENT_DLL , "GetScreenSize" , index::IEngineClient::PATTERN_GetScreenSize, index::IEngineClient::GetScreenSize },
+};
+
+IndexFileGenerator::IndexFileGenerator()
+{
+	m_pFile = new LogFile();
+	m_pFile->Create( DllDir + "Generated" , INDEX_GEN_FILE );
+}
+
+IndexFileGenerator::~IndexFileGenerator()
+{
+	delete m_pFile;
+}
+
+void IndexFileGenerator::Generate()
+{
+	m_pFile->WriteDebugLog( "#pragma once\n\n" );
+	m_pFile->WriteDebugLog( "namespace index\n{\n\t" );
+
+	m_pFile->WriteDebugLog( "namespace SchemaBase\n\t{\n\t\tconstexpr auto GetClientClass = 30;\n\t}\n" );
+
+	GenerateNamespace( m_IEngineClient_IndexList , "IEngineClient" );
+
+	m_pFile->WriteDebugLog( "}" );
+}
+
+void IndexFileGenerator::GenerateNamespace( vector<VMT_IndexList_t>& m_vIndex , string Name )
+{
+	m_pFile->WriteDebugLog( "\tnamespace %s\n\t{\n" , Name.c_str() );
+
+	for ( auto& offset : m_vIndex )
 	{
 		auto pFoundCall = (uint64_t)FindPattern( offset.m_sDll.c_str() , offset.m_sOffsetPattern.c_str() );
 
@@ -294,13 +315,18 @@ auto SDK_Generator::Find_DotaVMT_Index() -> void
 
 			if ( pNewIndex != offset.m_uDefaultIndex )
 			{
-				m_pLog->WriteDebugLog( "[SDK-Gen] NEW INDEX -> %s %i\n" , offset.m_sOffsetName.c_str() , pNewIndex );
+				m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i; // new\n" , offset.m_sOffsetName.c_str() , pNewIndex );
+			}
+			else
+			{
+				m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i;\n" , offset.m_sOffsetName.c_str() , offset.m_uDefaultIndex );
 			}
 		}
 		else
 		{
-			m_pLog->WriteDebugLog( "[SDK-Gen] ERROR: %s -> %s\n" , offset.m_sDll.c_str() , offset.m_sOffsetName.c_str() );
-			break;
+			m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = 0; // error find\n" , offset.m_sOffsetName.c_str() );
 		}
 	}
+
+	m_pFile->WriteDebugLog( "\t}\n" );
 }

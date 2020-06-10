@@ -2,14 +2,12 @@
 
 #include "../DllMain.hpp"
 
-#define DEBUG_LOG_FILE "debug.log"
-
-class DebugLog
+class LogFile
 {
 public:
-	auto Create( string& szDllDir ) -> void;
+	auto Create( string szDllDir , string CustomFile ) -> void;
 
-	~DebugLog();
+	~LogFile();
 
 	auto WriteDebugLog( const char* sFormat , ... ) -> void;
 

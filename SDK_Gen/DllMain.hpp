@@ -16,3 +16,5 @@
 #pragma comment(lib,"psapi")
 
 using namespace std;
+
+extern string DllDir;

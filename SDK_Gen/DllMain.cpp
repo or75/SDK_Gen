@@ -1,20 +1,24 @@
 #include "DllMain.hpp"
 #include "Generator.hpp"
 
-auto GeneratorThread( HINSTANCE hinstDLL ) -> void
+string DllDir = "";
+
+auto GeneratorThread( HINSTANCE hinstDLL ) -> DWORD
 {
-	auto m_pGenerator = new SDK_Generator( hinstDLL );
+	char sDllDir[MAX_PATH] = { 0 };
+
+	if ( GetModuleFileNameA( hinstDLL , sDllDir , MAX_PATH ) )
+		DllDir = filesystem::path( sDllDir ).parent_path().string() + "\\";
+
+	auto m_pGenerator = new SDK_Generator();
 
 	m_pGenerator->Generate();
 
 	delete m_pGenerator;
-}
 
-auto Initalize( HINSTANCE hinstDLL ) -> void
-{
-	thread Generator( GeneratorThread , hinstDLL );
+	FreeLibraryAndExitThread( hinstDLL , 0 );
 
-	Generator.detach();
+	return 0;
 }
 
 auto WINAPI DllMain( HINSTANCE hinstDLL , DWORD Reason , PVOID pReserved ) -> BOOL
@@ -24,7 +28,7 @@ auto WINAPI DllMain( HINSTANCE hinstDLL , DWORD Reason , PVOID pReserved ) -> BO
 		case DLL_PROCESS_ATTACH:
 		{
 			DisableThreadLibraryCalls( hinstDLL );
-			Initalize( hinstDLL );
+			CreateThread( NULL , NULL , (LPTHREAD_START_ROUTINE)GeneratorThread , hinstDLL , NULL , NULL );
 			break;
 		}
 		case DLL_PROCESS_DETACH:
