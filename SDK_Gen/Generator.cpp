@@ -275,6 +275,32 @@ vector<VMT_IndexList_t> m_IEngineClient_IndexList =
 	{ CLIENT_DLL , "GetNetChannelInfo" , index::IEngineClient::PATTERN_GetNetChannelInfo, index::IEngineClient::GetNetChannelInfo },
 	{ CLIENT_DLL , "ClientCmd_Unrestricted" , index::IEngineClient::PATTERN_ClientCmd_Unrestricted, index::IEngineClient::ClientCmd_Unrestricted },
 	{ CLIENT_DLL , "GetScreenSize" , index::IEngineClient::PATTERN_GetScreenSize, index::IEngineClient::GetScreenSize },
+	{ CLIENT_DLL , "GetLevelName" , index::IEngineClient::PATTERN_GetLevelName, index::IEngineClient::GetLevelName },
+	{ CLIENT_DLL , "GetLevelNameShort" , index::IEngineClient::PATTERN_GetLevelNameShort, index::IEngineClient::GetLevelNameShort },
+};
+
+vector<VMT_IndexList_t> m_CAnimResourceSequence_IndexList =
+{
+	{ ANIMATIONSYSTEM_DLL , "GetSequenceName" , index::CAnimResourceSequence::PATTERN_GetSequenceName , index::CAnimResourceSequence::GetSequenceName , true , true } ,
+	{ ANIMATIONSYSTEM_DLL , "GetNumActivities" , index::CAnimResourceSequence::PATTERN_GetNumActivities , index::CAnimResourceSequence::GetNumActivities , true } ,
+	{ ANIMATIONSYSTEM_DLL , "GetActivityName" , index::CAnimResourceSequence::PATTERN_GetActivityName , index::CAnimResourceSequence::GetActivityName , true } ,
+	{ ANIMATIONSYSTEM_DLL , "GetActivityWeight" , index::CAnimResourceSequence::PATTERN_GetActivityWeight , index::CAnimResourceSequence::GetActivityWeight , true } ,
+	{ ANIMATIONSYSTEM_DLL , "GetActivityType" , index::CAnimResourceSequence::PATTERN_GetActivityType , index::CAnimResourceSequence::GetActivityType , true } ,
+};
+
+vector<VMT_IndexList_t> m_CModelAnimation_IndexList =
+{
+	{ CLIENT_DLL , "GetModelSequenceList" , index::CModelAnimation::PATTERN_GetModelSequenceList , index::CModelAnimation::GetModelSequenceList , false , true }
+};
+
+vector<VMT_IndexList_t> m_IResourceSystem_IndexList =
+{
+	{ PANORAMA_DLL , "CreateResourceManifestInternal" , index::IResourceSystem::PATTERN_CreateResourceManifestInternal , index::IResourceSystem::CreateResourceManifestInternal } ,
+	{ ENGINE_DLL , "FindResourceById" , index::IResourceSystem::PATTERN_FindResourceById , index::IResourceSystem::FindResourceById } ,
+	{ RESOURCESYSTEM_DLL , "GetNamedResourceCount" , index::IResourceSystem::PATTERN_GetNamedResourceCount , index::IResourceSystem::GetNamedResourceCount } ,
+	{ RESOURCESYSTEM_DLL , "GetAllNamedResourcesByType" , index::IResourceSystem::PATTERN_GetAllNamedResourcesByType , index::IResourceSystem::GetAllNamedResourcesByType } ,
+	{ RESOURCESYSTEM_DLL , "ResourceHandleToResourceId" , index::IResourceSystem::PATTERN_ResourceHandleToResourceId , index::IResourceSystem::ResourceHandleToResourceId } ,
+	{ RESOURCESYSTEM_DLL , "GetResourceTypeName" , index::IResourceSystem::PATTERN_GetResourceTypeName , index::IResourceSystem::GetResourceTypeName } ,
 };
 
 IndexFileGenerator::IndexFileGenerator()
@@ -296,6 +322,9 @@ void IndexFileGenerator::Generate()
 	m_pFile->WriteDebugLog( "namespace SchemaBase\n\t{\n\t\tconstexpr auto GetClientClass = 30;\n\t}\n" );
 
 	GenerateNamespace( m_IEngineClient_IndexList , "IEngineClient" );
+	GenerateNamespace( m_CAnimResourceSequence_IndexList , "CAnimResourceSequence" );
+	GenerateNamespace( m_CModelAnimation_IndexList , "CModelAnimation" );
+	GenerateNamespace( m_IResourceSystem_IndexList , "IResourceSystem" );
 
 	m_pFile->WriteDebugLog( "}" );
 }
@@ -304,22 +333,32 @@ void IndexFileGenerator::GenerateNamespace( vector<VMT_IndexList_t>& m_vIndex , 
 {
 	m_pFile->WriteDebugLog( "\tnamespace %s\n\t{\n" , Name.c_str() );
 
+	auto WriteNewIndex = [&]( VMT_IndexList_t& offset , uint64_t address )
+	{
+		auto pCallOffset = offset.m_bOneByteCall ? *(uint8_t*)( address + 2 ) : *(int32_t*)( address + 2 );
+		auto pNewIndex = pCallOffset / sizeof( int64_t );
+
+		if ( pNewIndex != offset.m_uDefaultIndex )
+			m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i; // new\n" , offset.m_sOffsetName.c_str() , pNewIndex );
+		else
+			m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i;\n" , offset.m_sOffsetName.c_str() , offset.m_uDefaultIndex );
+	};
+
 	for ( auto& offset : m_vIndex )
 	{
 		auto pFoundCall = (uint64_t)FindPattern( offset.m_sDll.c_str() , offset.m_sOffsetPattern.c_str() );
 
 		if ( pFoundCall )
 		{
-			auto pCallOffset = offset.m_bOneByteCall ? *(uint8_t*)( pFoundCall + 2 ) : *(uint32_t*)( pFoundCall + 2 );
-			auto pNewIndex = pCallOffset / sizeof( uint64_t );
-
-			if ( pNewIndex != offset.m_uDefaultIndex )
+			if ( offset.m_bJmpRaxPtr )
 			{
-				m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i; // new\n" , offset.m_sOffsetName.c_str() , pNewIndex );
+				uint64_t pPointerJmpRax = ( pFoundCall + 7 ) + *(int32_t*)( pFoundCall + 3 ) + 3; // add offset mov 
+
+				WriteNewIndex( offset , pPointerJmpRax );
 			}
 			else
 			{
-				m_pFile->WriteDebugLog( "\t\tconstexpr auto %s = %i;\n" , offset.m_sOffsetName.c_str() , offset.m_uDefaultIndex );
+				WriteNewIndex( offset , pFoundCall );
 			}
 		}
 		else

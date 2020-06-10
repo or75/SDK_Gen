@@ -2,6 +2,10 @@
 
 #define ENGINE_DLL					"engine2.dll"
 #define CLIENT_DLL					"client.dll"
+#define ANIMATIONSYSTEM_DLL			"animationsystem.dll"
+#define PANORAMA_DLL				"panorama.dll"
+#define RESOURCESYSTEM_DLL			"resourcesystem.dll"
+
 #define SCHEMASYSTEM_DLL			"schemasystem.dll"
 #define INTERFACE_SCHEMASYSTEM		"SchemaSystem_001"
 
@@ -72,7 +76,7 @@ struct VMT_IndexList_t
 	string m_sDll = "";
 	string m_sOffsetName = "";
 	string m_sOffsetPattern = "";
-
 	uint32_t m_uDefaultIndex = 0;
+	bool m_bJmpRaxPtr = false;
 	bool m_bOneByteCall = false;
 };

@@ -58,7 +58,8 @@ namespace index
 		constexpr auto PATTERN_GetNetChannelInfo = "FF 90 ? ? ? ? 48 8B D8 ? ? ? ? ? ? ? 48 85 C0";
 		constexpr auto PATTERN_ClientCmd_Unrestricted = "FF 90 ? ? ? ? BA ? ? ? ? 48 8B CB 48 83 C4 20 5B E9 ? ? ? ?";
 		constexpr auto PATTERN_GetScreenSize = "FF 90 ? ? ? ? 66 ? ? ? ? ? ? ? F3 0F E6 C0 66 0F 6E CB";
-		constexpr auto PATTERN_GetLevelName = "FF 90 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 80 38 00 0F 84 ? ? ? ? ? ? ? ? ? ? ? 48 85 C9 74 0A";
+		constexpr auto PATTERN_GetLevelName = "FF 90 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 80 38 00 0F 84 ? ? ? ? ? ? ? ? ? ? ? 48 85 C9 74";
+		constexpr auto PATTERN_GetLevelNameShort = "FF 90 ? ? ? ? 4C 8B C0 ? ? ? ? ? ? ? 48 8D 4C 24 70";
 
 		/*
 		// PATTERN:
@@ -111,7 +112,62 @@ namespace index
 		00007FFB0A73C1C4 | 48:83C4 28                 | add rsp,0x28                                          |
 		00007FFB0A73C1C8 | C3                         | ret                                                   |
 		*/
-		constexpr auto GetLevelName = 49;
-		constexpr auto GetLevelNameShort = GetLevelName + 1;
+		constexpr auto GetLevelName = 47;
+		/*
+		00007FFCE4EB9AD4 | FF90 80010000          | call qword ptr ds:[rax+0x180]                                     | // offset
+		00007FFCE4EB9ADA | 4C:8BC0                | mov r8,rax                                                        |
+		00007FFCE4EB9ADD | 48:8D15 144A7C00       | lea rdx,qword ptr ds:[0x7FFCE567E4F8]                             | 00007FFCE567E4F8:"scripts/shops/%s_shops.txt"
+		00007FFCE4EB9AE4 | 48:8D4C24 70           | lea rcx,qword ptr ss:[rsp+0x70]                                   |
+		*/
+		constexpr auto GetLevelNameShort = 48;
+	}
+	namespace CAnimResourceSequence
+	{
+		constexpr auto PATTERN_GetSequenceName = "? ? ? ? ? ? ? 48 89 41 40 48 63 73 20 3B 73 30 75 ? 48 8D 4B 28 E8 ? ? ? ? FF 43 20 48 8D 14 B6 48 8B 4B 28 48 C1 E2 04 48 03 CA 74 ? 48 89 39 48 89 79 08 48 89 79 10 66 C7 41 18 1D FF C6 41 1A 00 48 89 79 28 48 89 79 30 48 8B 4B 28 ? ? ? ? ? ? ? 48 03 CA 48 89 41 10 ? ? ? ? ? ? ? 48 89 01 ? ? ? ? ? ? ? 48 89 41 08 48 89 59 30 66 C7 41 18 1F 00";
+		constexpr auto PATTERN_GetNumActivities = "? ? ? ? ? ? ? 48 89 41 40 C7 41 ? ? ? ? ? 48 63 73 20 3B 73 30 75 ? 48 8D 4B 28 E8 ? ? ? ? FF 43 20 48 8D 14 B6 48 8B 4B 28 48 C1 E2 04 48 03 CA 74 ? 48 89 39 48 89 79 08 48 89 79 10 66 C7 41 18 1D FF C6 41 1A 00 48 89 79 28 48 89 79 30 48 8B 4B 28 ? ? ? ? ? ? ? 48 03 CA 48 89 41 10 ? ? ? ? ? ? ? 48 89 01 48 89 41 08 48 89 59 30 48 0F BE 41 1A C6 41 18 1E C6 44 08 1B 05 FE 41 1A 0F BE 41 1A 83 E8 01 C6 41 19 00 48 63 D0 78 ? 66 90 80 7C 11 1B 20";
+		constexpr auto PATTERN_GetActivityName = "? ? ? ? ? ? ? 48 89 41 40 48 63 73 20 3B 73 30 75 ? 48 8D 4B 28 E8 ? ? ? ? FF 43 20 48 8D 14 B6 48 8B 4B 28 48 C1 E2 04 48 03 CA 74 ? 48 89 39 48 89 79 08 48 89 79 10 66 C7 41 18 1D FF C6 41 1A 00 48 89 79 28 48 89 79 30 48 8B 4B 28 ? ? ? ? ? ? ? 48 03 CA 48 89 41 10 ? ? ? ? ? ? ? 48 89 01 48 89 41 08 48 89 59 30 48 0F BE 41 1A C6 41 18 01";
+		constexpr auto PATTERN_GetActivityWeight = "? ? ? ? ? ? ? 48 89 41 40 48 63 73 20 3B 73 30 75 ? 48 8D 4B 28 E8 ? ? ? ? FF 43 20 48 8D 14 B6 48 8B 4B 28 48 C1 E2 04 48 03 CA 74 ? 48 89 39 48 89 79 08 48 89 79 10 66 C7 41 18 1D FF C6 41 1A 00 48 89 79 28 48 89 79 30 48 8B 4B 28 ? ? ? ? ? ? ? 48 03 CA 48 89 41 10 ? ? ? ? ? ? ? 48 89 01 48 89 41 08 48 89 59 30 48 0F BE 41 1A C6 41 18 05 C6 44 08 1B 05";
+		constexpr auto PATTERN_GetActivityType = "? ? ? ? ? ? ? 48 89 41 40 48 63 73 20 3B 73 30 75 ? 48 8D 4B 28 E8 ? ? ? ? FF 43 20 48 8D 14 B6 48 8B 4B 28 48 C1 E2 04 48 03 CA 74 ? 48 89 39 48 89 79 08 48 89 79 10 66 C7 41 18 1D FF C6 41 1A 00 48 89 79 28 48 89 79 30 48 8B 4B 28 ? ? ? ? ? ? ? 48 03 CA 48 89 41 10 ? ? ? ? ? ? ? 48 89 01 ? ? ? ? ? ? ? 48 89 41 08 48 89 59 30 48 0F BE 41 1A C6 41 18 00";
+
+		// Reverse GetSequenceName + CAnimResourceSequence indexes !!!
+		// GetName,NumActivities,GetActivityNamemGetActivityWeight,GetActivityType string find in animationsystem.dll
+
+		constexpr auto GetSequenceName = 5;
+		constexpr auto GetNumActivities = 23;
+		constexpr auto GetActivityName = 24;
+		constexpr auto GetActivityWeight = 25;
+		constexpr auto GetActivityType = 26;
+	}
+	namespace CModelAnimation
+	{
+		// Reverse GetSequenceName
+		constexpr auto PATTERN_GetModelSequenceList = "FF 50 ? 3B 18 7D ? B8 ? ? ? ? 48 83 C4 20 5B C3";
+
+		constexpr auto GetModelSequenceList = 12;
+	}
+	namespace IResourceSystem
+	{
+		constexpr auto PATTERN_CreateResourceManifestInternal = "FF 90 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 48 ? ? ? ? ? ? 75 ? ? ? ? ? ? ? ? 48 8D 4D 80 E8 ? ? ? ?";
+		constexpr auto PATTERN_FindResourceById = "FF 90 ? ? ? ? 48 8B E8 48 85 C0 0F 84 ? ? ? ? 4C 8B 0B";
+		constexpr auto PATTERN_GetNamedResourceCount = "FF 90 ? ? ? ? 8B F8 83 F8 01 7C ? 8B D0 48 8D 4C 24 40";
+		constexpr auto PATTERN_GetAllNamedResourcesByType = "? ? ? ? ? ? 48 63 F8 45 8B E7 89 7C 24 30 4C 8B F7 48 89 7D 88";
+		constexpr auto PATTERN_ResourceHandleToResourceId = "FF 90 ? ? ? ? ? ? ? ? ? ? ? BA ? ? ? ? 48 8B F8 8B 09";
+		constexpr auto PATTERN_GetResourceTypeName = "? ? ? ? ? ? 48 89 44 24 20 45 8B CC ? ? ? ? ? ? ?";
+
+		/*
+		Find resourcesystem.dll -> "An attempt was made to create a resource manifest with debug name \"%s\" while the resource system was shutting down.\n"
+		*/
+		constexpr auto CreateResourceManifestInternal = 24;
+		/*
+		Find resourcesystem.dll -> "00007FFD168CD730:"ERROR: %s resource %016llX requested but not resident. (Missing from from a manifest?)\n""
+		*/
+		constexpr auto FindResourceById = 33;
+		/*
+		cmd -> resource_list
+		*/
+		constexpr auto GetNamedResourceCount = 34;
+		constexpr auto GetAllNamedResourcesByType = 35;
+		constexpr auto ResourceHandleToResourceId = 43;
+		constexpr auto GetResourceTypeName = 45;
 	}
 }
