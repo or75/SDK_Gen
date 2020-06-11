@@ -321,6 +321,9 @@ vector<VMT_IndexList_t> m_IGameUIService_IndexList =
 vector<VMT_IndexList_t> m_CDotaCameraManager_IndexList =
 {
 	{ CLIENT_DLL , "GetMapBounds" , index::CDotaCameraManager::PATTERN_GetMapBounds , index::CDotaCameraManager::GetMapBounds , false , true } ,
+	{ CLIENT_DLL , "GetAngles" , index::CDotaCameraManager::PATTERN_GetAngles , index::CDotaCameraManager::GetAngles } ,
+	{ CLIENT_DLL , "GetFOV" , index::CDotaCameraManager::PATTERN_GetFOV , index::CDotaCameraManager::GetFOV } ,
+	{ CLIENT_DLL , "GetDefaultCamera" , index::CDotaCameraManager::PATTERN_GetDefaultCamera , index::CDotaCameraManager::GetDefaultCamera } ,
 };
 
 IndexFileGenerator::IndexFileGenerator()

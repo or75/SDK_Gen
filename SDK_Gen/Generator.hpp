@@ -316,10 +316,65 @@ namespace index
 	namespace CDotaCameraManager
 	{
 		constexpr auto PATTERN_GetMapBounds = "FF 51 ? ? ? ? ? ? ? ? 48 8D 4C 24 60 E8 ? ? ? ? 84 C0";
+		constexpr auto PATTERN_GetAngles = "FF 92 ? ? ? ? 83 C9 FF F2 0F 10 00 F2 0F 11 44 24 30 8B 40 08 89 44 24 38";
+		constexpr auto PATTERN_GetFOV = "FF 92 ? ? ? ? 83 C9 FF F3 ? ? ? ? ? ? ? E8 ? ? ? ?";
+		constexpr auto PATTERN_GetDefaultCamera = "FF 92 ? ? ? ? F3 ? ? ? ? ? ? ? EB 08 F3 ? ? ? ? ? ? ?";
 
+		/*
+		00007FFAA3679710 | 8B41 70                       | mov eax,dword ptr ds:[rcx+0x70]                         |
+		00007FFAA3679713 | 8902                          | mov dword ptr ds:[rdx],eax                              |
+		00007FFAA3679715 | 8B41 74                       | mov eax,dword ptr ds:[rcx+0x74]                         |
+		00007FFAA3679718 | 8942 04                       | mov dword ptr ds:[rdx+0x4],eax                          |
+		00007FFAA367971B | 8B41 78                       | mov eax,dword ptr ds:[rcx+0x78]                         |
+		00007FFAA367971E | 8942 08                       | mov dword ptr ds:[rdx+0x8],eax                          |
+		00007FFAA3679721 | 8B41 7C                       | mov eax,dword ptr ds:[rcx+0x7C]                         |
+		00007FFAA3679724 | 41:8900                       | mov dword ptr ds:[r8],eax                               |
+		00007FFAA3679727 | 8B81 80000000                 | mov eax,dword ptr ds:[rcx+0x80]                         |
+		00007FFAA367972D | 41:8940 04                    | mov dword ptr ds:[r8+0x4],eax                           |
+		00007FFAA3679731 | 8B81 84000000                 | mov eax,dword ptr ds:[rcx+0x84]                         |
+		00007FFAA3679737 | 41:8940 08                    | mov dword ptr ds:[r8+0x8],eax                           |
+		00007FFAA367973B | C3                            | ret                                                     |
+		*/
 		constexpr auto GetMapBounds = 4;
+
+		/*
+		00007FFAA34E62E0 | 40:53                         | push rbx                                                |
+		00007FFAA34E62E2 | 48:83EC 70                    | sub rsp,0x70                                            |
+		00007FFAA34E62E6 | 48:8379 28 00                 | cmp qword ptr ds:[rcx+0x28],0x0                         |
+		00007FFAA34E62EB | 48:8BD9                       | mov rbx,rcx                                             |
+		00007FFAA34E62EE | 75 0D                         | jne client.7FFAA34E62FD                                 |
+		00007FFAA34E62F0 | 48:8D05 415A5102              | lea rax,qword ptr ds:[0x7FFAA59FBD38]                   |
+		00007FFAA34E62F7 | 48:83C4 70                    | add rsp,0x70                                            |
+		00007FFAA34E62FB | 5B                            | pop rbx                                                 |
+		00007FFAA34E62FC | C3                            | ret                                                     |
+		00007FFAA34E62FD | 8B0D 817C5202                 | mov ecx,dword ptr ds:[0x7FFAA5A0DF84]                   |
+		00007FFAA34E6303 | 6548:8B0425 58000000          | mov rax,qword ptr gs:[0x58]                             |
+		00007FFAA34E630C | BA 18000000                   | mov edx,0x18                                            |
+		00007FFAA34E6311 | 48:8B04C8                     | mov rax,qword ptr ds:[rax+rcx*8]                        |
+		00007FFAA34E6315 | 8B0C02                        | mov ecx,dword ptr ds:[rdx+rax]                          |
+		*/
 		constexpr auto GetAngles = 22;
+
+		/*
+		00007FFAA34E64F0 | 40:53                         | push rbx                                                |
+		00007FFAA34E64F2 | 48:83EC 40                    | sub rsp,0x40                                            |
+		00007FFAA34E64F6 | 48:8B01                       | mov rax,qword ptr ds:[rcx]                              |
+		00007FFAA34E64F9 | 48:8BD9                       | mov rbx,rcx                                             |
+		00007FFAA34E64FC | FF50 70                       | call qword ptr ds:[rax+0x70]                            |
+		00007FFAA34E64FF | 48:8B4B 28                    | mov rcx,qword ptr ds:[rbx+0x28]                         |
+		00007FFAA34E6503 | 84C0                          | test al,al                                              |
+		00007FFAA34E6505 | 74 48                         | je client.7FFAA34E654F                                  |
+		00007FFAA34E6507 | 48:8B01                       | mov rax,qword ptr ds:[rcx]                              |
+		00007FFAA34E650A | 0F297424 30                   | movaps xmmword ptr ss:[rsp+0x30],xmm6                   |
+		00007FFAA34E650F | 0F297C24 20                   | movaps xmmword ptr ss:[rsp+0x20],xmm7                   |
+		00007FFAA34E6514 | FF50 78                       | call qword ptr ds:[rax+0x78]                            |
+		00007FFAA34E6517 | 48:8B4B 30                    | mov rcx,qword ptr ds:[rbx+0x30]                         |
+		*/
 		constexpr auto GetFOV = 24;
+
+		/*
+		mov rax, qword ptr ds:[rcx+0x20]
+		*/
 		constexpr auto GetDefaultCamera = 29;
 	}
 }
