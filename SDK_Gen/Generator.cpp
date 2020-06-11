@@ -1,5 +1,7 @@
 #include "Generator.hpp"
 
+CSchemaSystem* m_pSchemaSystem = nullptr;
+
 SDK_Generator::SDK_Generator()
 {
 	m_pLog = new LogFile();
@@ -10,10 +12,13 @@ SDK_Generator::SDK_Generator()
 
 SDK_Generator::~SDK_Generator()
 {
+	m_pSchemaSystem = nullptr;
+
 	if ( m_pLog )
 	{
 		m_pLog->WriteDebugLog( "\n[SDK-Gen] End\n" );
 		delete m_pLog;
+		m_pLog = nullptr;
 	}
 }
 
@@ -303,6 +308,21 @@ vector<VMT_IndexList_t> m_IResourceSystem_IndexList =
 	{ RESOURCESYSTEM_DLL , "GetResourceTypeName" , index::IResourceSystem::PATTERN_GetResourceTypeName , index::IResourceSystem::GetResourceTypeName } ,
 };
 
+vector<VMT_IndexList_t> m_IInputService_IndexList =
+{
+	{ CLIENT_DLL , "GetCursorPos" , index::IInputService::PATTERN_GetCursorPos , index::IInputService::GetCursorPos }
+};
+
+vector<VMT_IndexList_t> m_IGameUIService_IndexList =
+{
+	{ CLIENT_DLL , "IsConsoleVisible" , index::IGameUIService::PATTERN_IsConsoleVisible , index::IGameUIService::IsConsoleVisible }
+};
+
+vector<VMT_IndexList_t> m_CDotaCameraManager_IndexList =
+{
+	{ CLIENT_DLL , "GetMapBounds" , index::CDotaCameraManager::PATTERN_GetMapBounds , index::CDotaCameraManager::GetMapBounds , false , true } ,
+};
+
 IndexFileGenerator::IndexFileGenerator()
 {
 	m_pFile = new LogFile();
@@ -325,6 +345,9 @@ void IndexFileGenerator::Generate()
 	GenerateNamespace( m_CAnimResourceSequence_IndexList , "CAnimResourceSequence" );
 	GenerateNamespace( m_CModelAnimation_IndexList , "CModelAnimation" );
 	GenerateNamespace( m_IResourceSystem_IndexList , "IResourceSystem" );
+	GenerateNamespace( m_IInputService_IndexList , "IInputService" );
+	GenerateNamespace( m_IGameUIService_IndexList , "IGameUIService" );
+	GenerateNamespace( m_CDotaCameraManager_IndexList , "CDotaCameraManager" );
 
 	m_pFile->WriteDebugLog( "}" );
 }

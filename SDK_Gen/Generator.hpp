@@ -5,11 +5,13 @@
 #include "Dota/DataBase.hpp"
 #include "Components/DebugLog.hpp"
 
-#define DUMP_SCHEMA_ALL 0
+#define DUMP_SCHEMA_ALL 1
 #define DEBUG_SCHEMA	0
 #define DEBUG_LOG_FILE "debug.log"
 
 class IndexFileGenerator;
+
+extern CSchemaSystem* m_pSchemaSystem;
 
 class SDK_Generator
 {
@@ -27,8 +29,6 @@ public:
 private:
 	// Log
 	LogFile* m_pLog = nullptr;
-	// Schema System
-	CSchemaSystem* m_pSchemaSystem = nullptr;
 
 private:
 	IndexFileGenerator* m_pIndexGenerator = nullptr;
@@ -169,5 +169,157 @@ namespace index
 		constexpr auto GetAllNamedResourcesByType = 35;
 		constexpr auto ResourceHandleToResourceId = 43;
 		constexpr auto GetResourceTypeName = 45;
+	}
+	namespace CVGuiPaintSurfaceMainThread
+	{
+		// CVGuiPaintSurfaceMainThread* = "? ? ? ? ? ? ? E8 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? 49 8B 5B 30"
+
+		constexpr auto PATTERN_DrawSetTextFont = "40 53 48 83 EC 30 89 ? ? ? ? ? 8B DA 8B ? ? ? ? ? BA ? ? ? ? FF 15 ? ? ? ?"; // function
+		constexpr auto PATTERN_DrawSetColor = "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 30 8B ? ? ? ? ? 8B F2"; // function
+		constexpr auto PATTERN_DrawFilledRect = "41 ? ? ? ? ? ? 80 7D 70 00 4C 8B 13 44 8B 7D 58 75 ? 8B D7 EB ? 8B 4D 30 8B D6"; // index
+		constexpr auto PATTERN_DrawSetTextColor = "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 30 8B 6C 24 60"; // function
+		constexpr auto PATTERN_DrawSetTextPos = "48 89 5C 24 08 57 48 83 EC 30 89 ? ? ? ? ? 8B DA ? ? ? ? ? ? ?"; // function
+		constexpr auto PATTERN_DrawPrintText = "44 89 4C 24 20 44 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 ? ? ? ? ? ? 48 8D 6C 24 30"; // function 
+		constexpr auto PATTERN_DrawSetTexture = "40 53 48 83 EC 20 8B ? ? ? ? ? 8B DA BA ? ? ? ? FF 15 ? ? ? ? 84 C0 74 1F"; // function
+		constexpr auto PATTERN_DrawTexturedRect = "41 ? ? ? ? ? ? EB 22 8B 4D 30 44 8B C6 44 8B 4D F0 03 CE 4C 8B 13"; // index
+
+		// "DrawSetAlphaMultiplier"
+		constexpr auto DrawSetAlphaMultiplier = 3;
+		// "DrawFilledRectFastFade"
+		constexpr auto DrawFilledRectFastFade = 8;
+		// "DrawFilledRectFade"
+		constexpr auto DrawFilledRectFade = 9;
+		// "DrawOutlinedCircle"
+		constexpr auto DrawOutlinedCircle = 10;
+		// "DrawTexturedPolyLine"
+		constexpr auto DrawTexturedPolyLine = 11;
+		// "DrawTexturedSubRect"
+		constexpr auto DrawTexturedSubRect = 12;
+		// "DrawSetTextFont"
+		constexpr auto DrawSetTextFont = 13;
+		// "DrawSetColor"
+		constexpr auto DrawSetColor = 17;
+		// "DrawFilledRect"
+		constexpr auto DrawFilledRect = 19;
+		// "DrawOutlinedRect" = no index
+		constexpr auto DrawOutlinedRect = 21;
+		// "DrawLine" = no index
+		constexpr auto DrawLine = 22;
+		// "DrawSetTextColor"
+		constexpr auto DrawSetTextColor = 25;
+		// "DrawSetTextPos"
+		constexpr auto DrawSetTextPos = 26;
+		// "DrawPrintText"
+		constexpr auto DrawPrintText = 27;
+		// "DrawUnicodeChar"
+		constexpr auto DrawUnicodeChar = 28;
+		// "DrawUnicodeString"
+		constexpr auto DrawUnicodeString = 30;
+		// "DrawFlushText"
+		constexpr auto DrawFlushText = 31;
+		// "DrawWordBubble"
+		constexpr auto DrawWordBubble = 32;
+		// "DrawSetTexture"
+		constexpr auto DrawSetTexture = 33;
+		// "DrawTexturedRect"
+		constexpr auto DrawTexturedRect = 34;
+		// "DrawTexturedRectEx"
+		constexpr auto DrawTexturedRectEx = 35;
+		// "DrawTexturedLine"
+		constexpr auto DrawTexturedLine = 36;
+		// "DrawTexturedPolygon"
+		constexpr auto DrawTexturedPolygon = 38;
+		// "DrawGradientFilledRect"
+		constexpr auto DrawGradientFilledRect = 39;
+	}
+	namespace IVPanel
+	{
+		constexpr auto GetName = 50; // VPANEL panel + 0x130
+	}
+	namespace CVGuiRenderSurface
+	{
+		constexpr auto PATTERN_DrawSetTextureRGBA = "48 83 EC 38 8B 44 24 60 4C 8B 11 C7 44 ? ? ? ? ? ? 89 44 24 20 41 ? ? ? ? ? ? 48 83 C4 38 C3"; // function
+		constexpr auto PATTERN_CreateNewTextureID = "48 83 EC 28 ? ? ? ? ? ? ? 48 8D 54 24 40 48 ? ? ? ? ? ? ? ? 48 8B 01 FF 10 48 83 C4 28 C3"; // function
+		constexpr auto PATTERN_CreateFont = "48 89 5C 24 08 57 48 83 EC 20 48 63 79 28 48 8B D9 3B 79 38 75 09"; // ptr function
+		constexpr auto PATTERN_SetFontGlyphSet = "48 89 5C 24 10 48 89 6C 24 18 44 89 4C 24 20 56 41 54 41 55 41 56 41 57 48 83 EC 60 48 8B E9"; // ptr function
+		constexpr auto PATTERN_GetTextSize = "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 50 0F B6 44 24 48 48 8D 4C 24 30"; // function
+		constexpr auto DrawSetTextureRGBA = 17;
+		constexpr auto IsTextureIDValid = 21; // all return true
+		constexpr auto DeleteTextureByID = 22; // all return false
+		constexpr auto CreateNewTextureID = 23;
+		// PTR = "48 ? ? ? ? ? ? ? 48 8B FA 48 89 74 24 70 48 8B F1 0F 84 ? ? ? ?"
+		constexpr auto LoadFont = 51; // CreateFont = PTR + 0x58
+		constexpr auto SetFontGlyphSet = 58; // PTR + 0xD8
+		constexpr auto GetTextSize = 66; // jmp pattern
+	}
+	namespace ICvar
+	{
+		constexpr auto PATTERN_FindCommandBase = "48 83 EC 38 8B 44 24 60 4C 8B 11 C7 44 ? ? ? ? ? ? 89 44 24 20 41 ? ? ? ? ? ? 48 83 C4 38 C3"; // function
+		constexpr auto PATTERN_FindVar = "40 53 48 83 EC 20 48 8B 01 FF 90 ? ? ? ? 48 8B D8 48 85 C0 75 06 48 83 C4 20 5B C3"; // function call + 0x80 FindCommandBase
+		constexpr auto PATTERN_ConsoleColorPrintf = "4C 89 44 24 18 4C 89 4C 24 20 53 55 57 B8 ? ? ? ? E8 ? ? ? ?"; // function
+
+		// ""Convars/CCvar::FindCommandBase""
+		constexpr auto FindCommandBase = 16; // and 17
+		constexpr auto FindVar = 18; // call FindCommandBase
+		constexpr auto ConsoleColorPrintf = 27;
+		constexpr auto ConsolePrintf = 28;
+		constexpr auto ConsoleDPrintf = 29;
+	}
+	namespace IInputService
+	{
+		constexpr auto PATTERN_GetCursorPos = "FF 90 ? ? ? ? ? ? ? ? ? ? ? 4C 8D 44 24 24 48 8D 54 24 48 48 8B 01";
+
+		constexpr auto GetCursorPos = 61;
+	}
+	namespace IGameUIService
+	{
+		constexpr auto PATTERN_IsConsoleVisible = "FF 90 ? ? ? ? 84 C0 75 41 ? ? ? ? ? ? ? 39 70 58 74 35";
+
+		constexpr auto IsConsoleVisible = 27;
+	}
+	namespace IUIInputEngine
+	{
+		constexpr auto GetInputCapture = 40; // 41 all
+	}
+	namespace IUIEngine
+	{
+		constexpr auto UIInputEngine = 19; // mov rax, qword ptr ds:[rcx+0x1B0]
+	}
+	namespace CPanoramaUIEngine
+	{
+		constexpr auto AccessUIEngine = 13; // mov rax, qword ptr ds:[rcx+0x28]
+	}
+	namespace CDotaMapUtils
+	{
+		constexpr auto PATTERN_GetPositionHeight = "0F 28 C3 0F 28 CA 83 FA FF 74 25 0F B7 C2 48 8D 14 40 48 8B 41 48 48 8B 4C D0 08 48 85 C9 74 10 F3 ? ? ? ? ? ? ? 0F 28 D0 E9 ? ? ? ? 0F 57 C0 C3"; // function
+
+		/*
+		00007FFA9FA47C70 | 0F28C3                        | movaps xmm0,xmm3                                        |
+		00007FFA9FA47C73 | 0F28CA                        | movaps xmm1,xmm2                                        |
+		00007FFA9FA47C76 | 83FA FF                       | cmp edx,0xFFFFFFFF                                      |
+		00007FFA9FA47C79 | 74 25                         | je host.7FFA9FA47CA0                                    |
+		00007FFA9FA47C7B | 0FB7C2                        | movzx eax,dx                                            |
+		00007FFA9FA47C7E | 48:8D1440                     | lea rdx,qword ptr ds:[rax+rax*2]                        |
+		00007FFA9FA47C82 | 48:8B41 48                    | mov rax,qword ptr ds:[rcx+0x48]                         |
+		00007FFA9FA47C86 | 48:8B4CD0 08                  | mov rcx,qword ptr ds:[rax+rdx*8+0x8]                    |
+		00007FFA9FA47C8B | 48:85C9                       | test rcx,rcx                                            |
+		00007FFA9FA47C8E | 74 10                         | je host.7FFA9FA47CA0                                    |
+		00007FFA9FA47C90 | F3:0F101D 40031200            | movss xmm3,dword ptr ds:[0x7FFA9FB67FD8]                |
+		00007FFA9FA47C98 | 0F28D0                        | movaps xmm2,xmm0                                        |
+		00007FFA9FA47C9B | E9 C0190C00                   | jmp host.7FFA9FB09660                                   |
+		00007FFA9FA47CA0 | 0F57C0                        | xorps xmm0,xmm0                                         |
+		00007FFA9FA47CA3 | C3                            | ret                                                     |
+		*/
+
+		constexpr auto GetPositionHeight = 16; // 19 index = return -16384.0 default
+	}
+	namespace CDotaCameraManager
+	{
+		constexpr auto PATTERN_GetMapBounds = "FF 51 ? ? ? ? ? ? ? ? 48 8D 4C 24 60 E8 ? ? ? ? 84 C0";
+
+		constexpr auto GetMapBounds = 4;
+		constexpr auto GetAngles = 22;
+		constexpr auto GetFOV = 24;
+		constexpr auto GetDefaultCamera = 29;
 	}
 }
